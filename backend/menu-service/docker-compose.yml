@@ -1,22 +1,25 @@
 services:
-  menu-service:
+  web:
     build: .
-    env_file: .env
+    container_name: menuService
     ports:
-      - "8000:80"
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
     depends_on:
       - db
 
   db:
-    image: cassandra:4.1
-    container_name: cassandra-db
-    environment:
-      CASSANDRA_CLUSTER_NAME: "MenuCluster"
-      CASSANDRA_NUM_TOKENS: 16
+    image: postgres:16
+    container_name: postgres-db
     ports:
-      - "9042:9042"
+      - "5433:5432"   # host:container
+    env_file:
+      - .env
     volumes:
-      - cassandra_data:/var/lib/cassandra
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  cassandra_data:
+  postgres_data:
