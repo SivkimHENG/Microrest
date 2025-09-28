@@ -37,8 +37,10 @@ MVC is for simplicity
 
 
 
+## TODO 
 
-
+DONE -> Infra
+DONE -> Gateway
 
 
 

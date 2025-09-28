@@ -1,0 +1,58 @@
+services:
+  api-gateway:
+    build: ../gateway
+    container_name: api-gateway
+    ports:
+      - "8080:80"
+    volumes:
+      - ../gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    # depends_on:
+    #   - admin-service
+    #   - menu-service
+    #   - order-service
+    #   - payment-service
+    #   - reservation-service
+    #   - review-service
+    #   - delivery-service
+
+  # admin-service:
+  #     build: ../backend/admin-service
+  #     container_name: admin-service
+  #     ports:
+  #       - "5001:5000"
+
+  # menu-service:
+  #     build: ../backend/menu-service
+  #     container_name: menu-service
+  #     ports:
+  #       - "5002:5000"
+
+  # order-service:
+  #     build: ../backend/order-service
+  #     container_name: order-service
+  #     ports:
+  #       - "5003:5000"
+
+  # payment-service:
+  #     build: ../backend/payment-service
+  #     container_name: payment-service
+  #     ports:
+  #       - "5004:5000"
+
+  # reservation-service:
+  #     build: ../backend/reservation-service
+  #     container_name: reservation-service
+  #     ports:
+  #       - "5005:5000"
+
+  # review-service:
+  #     build: ../backend/review-service
+  #     container_name: review-service
+  #     ports:
+  #       - "5006:5000"
+
+  # delivery-service:
+  #     build: ../backend/delivery-service
+  #     container_name: delivery-service
+  #     ports:
+  #       - "5007:5000"
