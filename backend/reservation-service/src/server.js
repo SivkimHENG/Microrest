@@ -1,8 +1,8 @@
 import express from "express"
 import sequelize from "./utils/db.js"
 import cors from "cors"
-import { router  } from "./routes/index.js"
 
+import { Customer, Table, Reservation } from "./model/index.js";
 
 
 const app = express()
@@ -13,17 +13,23 @@ const PORT  = 5000
 
 
 
-sequelize.authenticate()
-.then(() => console.log("Database connected"))
-.catch(err => console.error("Database error Something went wrong", err.message));
+const start  = async () => {
+    try{
+        await sequelize.authenticate();
+        console.log("Database Connection");
 
-// sequelize.sync({ alter: true })
-//   .then(() => console.log("Models synced"))
-//   .catch(err => console.error("Sync error:", err));
+        await sequelize.sync({ force: true});
+        console.log("All the table Synced")
+    } catch (error) {
+        console.error("Sync error:", error)
 
+    }
+
+}
+
+start();
 
 app.use("/", router)
-
 
 
 app.listen(PORT, () => {

@@ -74,7 +74,7 @@ const Customer = sequelize.define("customer", {
 });
 
 Customer.prototype.getFullName = function () {
-    return `${this.firstName} ${this.lastName}`;
+    return `${this.firstname} ${this.lastname}`;
 };
 
 Customer.prototype.getAge = function() {

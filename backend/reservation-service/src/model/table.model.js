@@ -1,11 +1,11 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../utils/db";
+import sequelize from "../utils/db.js";
 
 
 //TODO: Finish Table Model for reservation
 
 
-const Table = sequelize.define("Table",{
+const Table = sequelize.define("tables",{
     id:{
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -28,19 +28,16 @@ const Table = sequelize.define("Table",{
             notNull: {msg: "Capacity is required"},
             min: { args: [1], msg: "Capacity must be at least 1" },
             max: { args: [10], msg: "Capacity cannot exceed 10" }
-        },
-
-
+        }
+    },
     isAvailable: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
         allowNull: false
     }
-    }
 },{
     tableName: "tables",
-    allowNull: true,
-
+    timestamps: true,
 
     indexes: [
         {unique: true,  fields:["tableNumber"]},

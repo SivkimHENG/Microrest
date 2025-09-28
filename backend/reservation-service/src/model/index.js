@@ -4,34 +4,13 @@ import  Reservation from "./reservation.model.js"
 
 
 
+Customer.hasMany(Reservation, {foreignKey: "customerId", as: "reservations", onDelete: "CASCADE"});
+Reservation.belongsTo(Customer, {foreignKey: "customerId", as: "customers"});
 
-Customer.hasMany(Reservation, {
-    foreignKey: "customerId",
-    as: "reservations",
-    onDelete: "CASCADE"
-});
-
-Reservation.belongsTo(Customer, {
-    foreignKey: "customerId",
-    as: "customer"
-
-});
-
-Table.hasMany(Reservation, {
-    foreignKey: "tableId",
-    as: "tables",
-    onDelete: "CASCADE"
-});
+Table.hasMany(Reservation, {foreignKey: "tableId", as: "reservations", onDelete: "CASCADE"});
+Reservation.belongsTo(Table, {foreignKey: "tableId", as: "tables"});
 
 
-Reservation.belongsTo(Table, {
-    foreignKey: "tableId",
-    as: "table"
-});
+export { Customer, Table, Reservation};
 
 
-export {
-    Customer,
-    Table,
-    Reservation
-}

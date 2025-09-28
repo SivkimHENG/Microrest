@@ -5,14 +5,14 @@ import sequelize from "../utils/db.js";
 
 
 
-const Reservation = sequelize.define("Reservation", {
+const Reservation = sequelize.define("reservations", {
 
     id: {
          type: DataTypes.INTEGER,
          autoIncrement: true,
          primaryKey: true
         },
-    customerid: {
+    customerId: {
          type: DataTypes.INTEGER,
          allowNull: false,
          references: {
@@ -70,17 +70,17 @@ const Reservation = sequelize.define("Reservation", {
         type: DataTypes.DATE,
         allowNull: true
     },
-    actualDepartmentureTime:{
+    actualDepartureTime:{
         type: DataTypes.DATE,
         allowNull: true
     },
     cancelledReason: {
          type: DataTypes.TEXT,
-         allowNull: false
+         allowNull: true
      },
      totalAmount: {
         type: DataTypes.DECIMAL(10,2),
-        allowNull: false,
+        allowNull: true,
         validate: {
             min: { args: [0], msg: "Amount cannot be negative" }
         }
@@ -122,7 +122,7 @@ const Reservation = sequelize.define("Reservation", {
             }
 
             if(reservation.changed("status") && reservation.status === "COMPLETED") {
-                reservation.actualDepartmentureTime = new Date();
+                reservation.actualDepartureTime = new Date();
             }
 
         }
@@ -136,7 +136,7 @@ Reservation.prototype.isExpired = function () {
 }
 
 Reservation.prototype.canBeCancelled = function() {
-    return ["PENDING", "CANCELLED"].includes(this.status) && !this.isExpired();
+    return ["PENDING", "CONFIRMED"].includes(this.status) && !this.isExpired();
 }
 
 Reservation.prototype.canBeConfirmed = function() {
@@ -145,8 +145,8 @@ Reservation.prototype.canBeConfirmed = function() {
 
 Reservation.prototype.getDuration = function () {
 
-    if(!actualArrivalTime || !actualDepartmentureTime) return null;
-    return Math.round((new Date(this.actualDepartmentureTime) - new Date(this.actualArrivalTime)) / (1000 * 60));
+    if(!actualArrivalTime || !actualDepartureTime) return null;
+    return Math.round((new Date(this.actualDepartureTime) - new Date(this.actualArrivalTime)) / (1000 * 60));
 
 }
 
