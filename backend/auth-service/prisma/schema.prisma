@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
+  output   = "../generated/prisma"
+}
+
+enum Roles {
+  ADMIN
+  CUSTOMER
+}
+
+model UserCredential {
+  id             Int            @id @default(autoincrement())
+  userUuid       String         @unique @db.Uuid
+  email          String         @unique
+  passwordHash   String
+
+  roles          UserRole[]     
+  refreshTokens  RefreshToken[] 
+  auditLogs      AuditLog[]     
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model UserRole {
+  id        Int            @id @default(autoincrement())
+  role      Roles
+  userId    Int
+  user      UserCredential @relation(fields: [userId], references: [id])
+}
+
+model RefreshToken {
+  id          Int            @id @default(autoincrement())
+  tokenHash   String
+  expiresAt   DateTime
+  ipAddress   String?
+  deviceInfo  String?
+  revokedAt   DateTime?
+  userId      Int
+  user        UserCredential @relation(fields: [userId], references: [id])
+}
+
+model AuditLog {
+  id         Int            @id @default(autoincrement())
+  action     String
+  success    Boolean
+  ipAddress  String?
+  userAgent  String?
+  userId     Int?
+  user       UserCredential? @relation(fields: [userId], references: [id])
+}
+
+
+
+
