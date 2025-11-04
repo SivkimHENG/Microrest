@@ -12,7 +12,7 @@ const jwtOptions = {
     jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_SECRET || "",
     issuer: "auth-service",
-    audience: "",
+    audience: "client",
     algorithms: ["HS256"],
     ignoreExpiration: false,
 };
@@ -24,7 +24,11 @@ passport_1.default.use(new passport_jwt_1.Strategy(jwtOptions, async (payload, d
         });
         if (!user)
             return done(null, false);
-        return done(null, user.id);
+        return done(null, {
+            userId: user.id,
+            userUuid: user.userUuid,
+            roles: user.roles.map(r => r.role)
+        });
     }
     catch (err) {
         console.error("Failed to JWT verfication ", err);
@@ -57,7 +61,7 @@ passport_1.default.use(new passport_local_1.Strategy({
     }
 }));
 passport_1.default.serializeUser((user, done) => {
-    done(null, user);
+    done(null, user.userUuid);
 });
 passport_1.default.deserializeUser(async (userUuid, done) => {
     try {

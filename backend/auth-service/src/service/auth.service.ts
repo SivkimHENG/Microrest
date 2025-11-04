@@ -7,72 +7,26 @@ import {
   verifyRefreshToken
 } from "../utils/jwt";
 import { Roles } from "../../generated/prisma";
+import { emitUserRegistrated } from "../events/domain.event";
 
 
 
-
-
-async function logAuditEvent(data: {
-  action: string,
-  success: boolean,
-  ipAddress?: string,
-  deviceInfo?: string,
-  userId?: number
-}) {
-
-  try {
-
-    var userId: number | null = null;
-
-    if (data.userId) {
-      const user = await prisma.userCredential.findUnique({
-        where: {
-          id: data.userId
-        },
-        select: { id: true }
-      });
-
-      userId = user?.id || null;
-    }
-
-    await prisma.auditLog.create({
-      data: {
-        action: data.action,
-        success: data.success,
-        ipAddress: data.ipAddress,
-        userId
-      }
-    });
-
-
-  } catch (err: any) {
-    console.error("Failed to log audit Event", err);
-
-  }
-
-
-
-}
-
-
-
-export async function userRegister(email: string, password: string, meta: { ipAddress: string, deviceInfo: string }) {
+export async function userRegister(email: string, password: string,
+  meta: { ipAddress: string, deviceInfo: string, traceparent?: string }) {
   try {
     const userUuid = uuidv4();
     const hashed = await bcrypt.hash(password, 12);
     const refreshTokenRaw = uuidv4();
     const refreshTokenHash = await bcrypt.hash(refreshTokenRaw, 12);
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    const registrationId = uuidv4();
+    const occurredAt = new Date().toISOString();
+
 
 
     const result = await prisma.$transaction(async (transaction) => {
       const user = await transaction.userCredential.create({
-        data: {
-          email,
-          passwordHash: hashed,
-          userUuid,
-
-        },
+        data: { email, passwordHash: hashed, userUuid, },
       });
 
 
@@ -88,10 +42,7 @@ export async function userRegister(email: string, password: string, meta: { ipAd
       })
 
       await transaction.userRole.create({
-        data: {
-          role: Roles.CUSTOMER,
-          userId: user.id
-        }
+        data: { role: Roles.CUSTOMER, userId: user.id }
       });
 
       await transaction.auditLog.create({
@@ -102,8 +53,31 @@ export async function userRegister(email: string, password: string, meta: { ipAd
           userAgent: meta.deviceInfo ?? null,
           userId: user.id,
         }
-
       });
+
+
+
+      await transaction.outbox.create({
+        data: {
+          aggregateType: "User",
+          aggregateId: user.userUuid,
+          type: "UserRegistered",
+          version: 1,
+          payload: {
+            event_id: registrationId,
+            type: "UserRegistered",
+            version: 1,
+            occurred_at: occurredAt,
+            user_id: user.id,
+            user_uuid: user.userUuid,
+            email: user.email,
+            role: ["CUSTOMER"]
+          }
+        }
+      })
+
+
+
 
       return transaction.userCredential.findUnique({
         where: {
@@ -115,6 +89,7 @@ export async function userRegister(email: string, password: string, meta: { ipAd
           auditLogs: true
         },
       });
+
     });
 
     const accessToken = generateAccessToken({
@@ -122,6 +97,9 @@ export async function userRegister(email: string, password: string, meta: { ipAd
       userUuid: result!.userUuid,
       roles: result!.roles.map((r) => r.role)
     });
+
+
+
 
     return {
       user: result,
@@ -138,6 +116,11 @@ export async function userRegister(email: string, password: string, meta: { ipAd
   }
 
 }
+
+
+
+
+
 
 
 export async function authenticated(email: string, password: string,
@@ -500,3 +483,42 @@ export async function refreshNewToken(oldRefreshToken: string,
 }
 
 
+async function logAuditEvent(data: {
+  action: string,
+  success: boolean,
+  ipAddress?: string,
+  deviceInfo?: string,
+  userId?: number
+}) {
+
+  try {
+
+    var userId: number | null = null;
+
+    if (data.userId) {
+      const user = await prisma.userCredential.findUnique({
+        where: {
+          id: data.userId
+        },
+        select: { id: true }
+      });
+
+      userId = user?.id || null;
+    }
+
+    await prisma.auditLog.create({
+      data: {
+        action: data.action,
+        success: data.success,
+        ipAddress: data.ipAddress,
+        userId
+      }
+    });
+
+
+  } catch (err: any) {
+    console.error("Failed to log audit Event", err);
+
+  }
+
+}

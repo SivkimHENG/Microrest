@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+model ProccessedEvent {
+  eventId     String   @id
+  processedAt DateTime @default(now())
+
+  @@index([processedAt])
+}
+
+model UserProfiles {
+  id       Int    @id @default(autoincrement())
+  eventId  String @unique @map("event_id") // track processed events
+  userId   Int    @unique @map("user_id")
+  userUuid String @unique @map("user_uuid") @db.Uuid
+
+  username    String  @db.VarChar(30)
+  email       String  @db.VarChar(50)
+  role        String  @db.VarChar(50)
+  profileUrl  String? @map("profile_url") @db.Text
+  bio         String? @db.VarChar(255)
+  phoneNumber String? @map("phone_number") @db.VarChar(20)
+
+  statuses Status[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  //  customer_perferences? CustomerPerference[]
+  // customer_favorite?    CustomerFavorite[]
+  // user_log             UserActivityLog[]
+
+  @@map("user_profiles")
+}
+
+model CustomerProfiles {
+  id             Int      @id @default(autoincrement())
+  user_id        Int      @map("user_id")
+  customer_since DateTime @default(now())
+  loyalty_points Int      @default(0)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+//model CustomerFavorite {
+//  id           Int @id @default(autoincrement())
+//  user_id      Int @map("user_id")
+//  menu_item_id Int @unique
+//
+//  timesOrdered  Int       @default(0)
+//  lastOrderedAt DateTime?
+//
+//  userProfile UserProfiles @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+//
+//  created_at DateTime @default(now())
+//  updated_at DateTime @updatedAt
+//}
+
+model CustomerAddress {
+  id            Int     @id @default(autoincrement())
+  address_line1 String? @db.VarChar(255)
+  address_line2 String? @db.VarChar(255)
+  city          String  @db.VarChar(100)
+  khan          String  @db.VarChar(100)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+//model CustomerPerference {
+//  id                Int     @id @default(autoincrement())
+//  user_id           Int     @unique
+//  push_notification Boolean @default(true)
+//
+//  created_at DateTime @default(now())
+//  updated_at DateTime @updatedAt
+//
+//  userProfile UserProfiles @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+//}
+//
+//model UserActivityLog {
+//  id        Int     @id @default(autoincrement())
+//  user_id   Int     @unique
+//  user_uuid String  @unique @db.Uuid
+//  action    String  @db.VarChar(100)
+//  success   Boolean
+//  message   String  @db.VarChar(50)
+//
+//  ip_address String? @db.Inet
+//  user_agent String? @db.Text
+//
+//  created_at DateTime @default(now())
+//
+//  userProfile UserProfiles @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+//}

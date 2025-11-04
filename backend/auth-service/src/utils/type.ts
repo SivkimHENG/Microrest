@@ -35,12 +35,11 @@ export interface DecodedToken {
   iat: number;
 }
 
-//export interface AuthRequest extends Request {
-//  user?: DecodedToken;
-//  token?: string;
-//}
-
 export enum UserRole {
   ADMIN = 'admin',
   CUSTOMER = 'customer'
 }
+
+
+
+

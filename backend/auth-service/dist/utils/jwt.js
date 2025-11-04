@@ -9,9 +9,12 @@ exports.generateRefreshToken = generateRefreshToken;
 exports.verifyRefreshToken = verifyRefreshToken;
 exports.decodeToken = decodeToken;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-// Make sure you have this in your .env file:
-// JWT_SECRET=your-super-secret-key-here
-// JWT_ACCESS_EXPIRY=15m (or whatever you want)
+const JWT_CONFIG = {
+    issuer: "auth-service",
+    audience: "client",
+    accessTokenExpiry: "15m",
+    refreshTokenExpiry: "7d"
+};
 function generateAccessToken(payload) {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
@@ -22,34 +25,48 @@ function generateAccessToken(payload) {
         userUuid: payload.userUuid,
         roles: payload.roles
     }, secret, {
-        expiresIn: process.env.JWT_ACCESS_EXPIRY || '15m',
-        issuer: 'microrest',
-        audience: 'your-app-users'
+        expiresIn: JWT_CONFIG.accessTokenExpiry,
+        issuer: JWT_CONFIG.issuer,
+        audience: JWT_CONFIG.audience,
+        algorithm: 'HS256'
     });
     return token;
 }
-// Optional: Function to verify tokens
 function verifyAccessToken(token) {
     const secret = process.env.JWT_SECRET;
-    if (!secret) {
-        throw new Error('JWT_SECRET is not defined in environment variables');
-    }
+    if (!secret)
+        throw new Error("JWT_SECRET is not defined is environment");
     try {
-        const decoded = jsonwebtoken_1.default.verify(token, secret);
+        const decoded = jsonwebtoken_1.default.verify(token, secret, {
+            issuer: JWT_CONFIG.issuer,
+            audience: JWT_CONFIG.audience,
+            algorithms: ["HS256"]
+        });
         return decoded;
     }
     catch (err) {
-        throw new Error('Invalid or expired token');
+        if (err.name === 'TokenExpiredError') {
+            throw new Error('TOKEN_EXPIRED');
+        }
+        if (err.name === 'JsonWebTokenError') {
+            throw new Error('INVALID_TOKEN');
+        }
+        throw new Error('TOKEN_VERIFICATION_FAILED');
     }
 }
-// Optional: Generate refresh token (if you want JWT-based refresh tokens)
 function generateRefreshToken(payload) {
-    const secret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET;
+    const secret = process.env.JWT_REFRESH_SECRET;
     if (!secret) {
         throw new Error('JWT_SECRET is not defined in environment variables');
     }
-    const token = jsonwebtoken_1.default.sign({ userUuid: payload.userUuid }, secret, {
-        expiresIn: '7d'
+    const token = jsonwebtoken_1.default.sign({
+        userId: payload.userId,
+        userUuid: payload.userUuid
+    }, secret, {
+        expiresIn: JWT_CONFIG.refreshTokenExpiry,
+        issuer: JWT_CONFIG.issuer,
+        audience: JWT_CONFIG.audience,
+        algorithm: "HS256"
     });
     return token;
 }
@@ -59,11 +76,21 @@ function verifyRefreshToken(token) {
         throw new Error('JWT_REFRESH_SECRET is not defined in environment variables');
     }
     try {
-        const decoded = jsonwebtoken_1.default.verify(token, secret);
-        return { userId: decoded.userId };
+        const decoded = jsonwebtoken_1.default.verify(token, secret, {
+            issuer: JWT_CONFIG.issuer,
+            audience: JWT_CONFIG.audience,
+            algorithms: ["HS256"]
+        });
+        return decoded;
     }
     catch (err) {
-        throw new Error("Invalid or expired refresh token");
+        if (err.name === 'TokenExpiredError') {
+            throw new Error('REFRESH_TOKEN_EXPIRED');
+        }
+        if (err.name === 'JsonWebTokenError') {
+            throw new Error('INVALID_REFRESH_TOKEN');
+        }
+        throw new Error('REFRESH_TOKEN_VERIFICATION_FAILED');
     }
 }
 function decodeToken(token) {

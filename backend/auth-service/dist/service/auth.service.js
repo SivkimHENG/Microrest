@@ -131,7 +131,7 @@ async function authenticated(email, password, meta) {
             });
             throw new Error("Invalid email or password");
         }
-        const refreshTokenRaw = (0, jwt_1.generateRefreshToken)({ userUuid: user.userUuid });
+        const refreshTokenRaw = (0, jwt_1.generateRefreshToken)({ userId: user.id, userUuid: user.userUuid });
         const refreshTokenHash = await bcrypt_1.default.hash(refreshTokenRaw, 12);
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
         await database_1.prisma.refreshToken.create({
@@ -187,9 +187,7 @@ async function logout(refreshToken, userId, meta) {
             throw new Error("Token does not belong to this user");
         }
         const user = await database_1.prisma.userCredential.findUnique({
-            where: {
-                id: userId
-            },
+            where: { id: userId },
             include: { roles: true }
         });
         if (!user) {
@@ -254,7 +252,7 @@ async function logout(refreshToken, userId, meta) {
         });
         return {
             success: true,
-            messasge: "Logged out successfully"
+            message: "Logged out successfully"
         };
     }
     catch (err) {
@@ -271,83 +269,115 @@ async function logout(refreshToken, userId, meta) {
         throw err;
     }
 }
-async function refreshNewToken(refreshToken, meta) {
+async function refreshNewToken(oldRefreshToken, meta) {
     try {
-        const decoded = (0, jwt_1.verifyRefreshToken)(refreshToken);
+        const decoded = (0, jwt_1.verifyRefreshToken)(oldRefreshToken);
         const user = await database_1.prisma.userCredential.findUnique({
-            where: { id: decoded.userId },
+            where: {
+                id: decoded.userId
+            },
             include: {
-                roles: true,
-                refreshTokens: {
-                    where: {
-                        revokedAt: null,
-                        expiresAt: { gt: new Date() }
-                    }
-                }
+                roles: true
             }
         });
         if (!user) {
             await logAuditEvent({
-                action: 'REFRESH_TOKEN_FAILED',
+                action: "REFRESH_TOKEN_FAILED_USER_NOT_FOUND",
                 success: false,
                 ipAddress: meta.ipAddress,
                 deviceInfo: meta.deviceInfo,
                 userId: decoded.userId
             });
-            throw new Error("User not found for refresh token");
+            throw new Error("USER_NOT_FOUND");
         }
-        let validToken = null;
-        for (const token of user.refreshTokens) {
-            if (await bcrypt_1.default.compare(refreshToken, token.tokenHash)) {
-                validToken = token;
-                break;
+        const storeToken = await database_1.prisma.refreshToken.findMany({
+            where: {
+                userId: user.id,
+                expiresAt: { gt: new Date() },
+                revokedAt: null
             }
-        }
-        if (!validToken) {
+        });
+        if (storeToken.length === 0) {
             await logAuditEvent({
-                action: 'REFRESH_TOKEN_REUSE_ATTEMPT',
+                action: "REFRESH_TOKEN_FAILED_NO_ACTIVE_SESSION",
                 success: false,
                 ipAddress: meta.ipAddress,
                 deviceInfo: meta.deviceInfo,
-                userId: user?.id
+                userId: user.id
             });
-            throw new Error("Refresh token invalid or already used");
+            throw new Error('NO_ACTIVE_SESSION');
         }
-        await database_1.prisma.refreshToken.update({
-            where: { id: validToken.id },
-            data: { revokedAt: new Date() }
-        });
-        const roles = user?.roles.map((r) => r.role) ?? [];
-        const newAccessToken = (0, jwt_1.generateAccessToken)({ userId: user?.id, userUuid: user?.userUuid, roles });
-        const newRefreshToken = (0, jwt_1.generateRefreshToken)({ userUuid: user?.userUuid });
-        await database_1.prisma.refreshToken.create({
-            data: {
-                tokenHash: await bcrypt_1.default.hash(newRefreshToken, 12),
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        let matchedToken = null;
+        for (const token of storeToken) {
+            const isMatch = await bcrypt_1.default.compare(oldRefreshToken, token.tokenHash);
+            if (isMatch) {
+                matchedToken = token;
+                break;
+            }
+        }
+        if (!matchedToken) {
+            await logAuditEvent({
+                action: "REFRESH_TOKEN_FAILED_INVALID_TOKEN",
+                success: false,
                 ipAddress: meta.ipAddress,
                 deviceInfo: meta.deviceInfo,
-                userId: user?.id
-            }
+                userId: user.id
+            });
+            throw new Error('INVALID_REFRESH_TOKEN');
+        }
+        const tokenPayload = {
+            userId: user.id,
+            userUuid: user.userUuid,
+            roles: user.roles.map(r => r.role)
+        };
+        const newAccessToken = (0, jwt_1.generateAccessToken)(tokenPayload);
+        const newRefreshToken = (0, jwt_1.generateRefreshToken)({
+            userId: user.id,
+            userUuid: user.userUuid
         });
+        const newRefreshTokenHash = await bcrypt_1.default.hash(newRefreshToken, 10);
+        await database_1.prisma.$transaction([
+            database_1.prisma.refreshToken.update({
+                where: { id: matchedToken.id },
+                data: { revokedAt: new Date() }
+            }),
+            database_1.prisma.refreshToken.create({
+                data: {
+                    userId: user.id,
+                    tokenHash: newRefreshTokenHash,
+                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                }
+            })
+        ]);
         await logAuditEvent({
-            action: 'REFRESH_TOKEN_SUCCESS',
+            action: "REFRESH_TOKEN_SUCCESS",
             success: true,
             ipAddress: meta.ipAddress,
             deviceInfo: meta.deviceInfo,
-            userId: user?.id
+            userId: user.id
         });
         return {
             accessToken: newAccessToken,
-            refreshToken: newRefreshToken
+            refreshToken: newRefreshToken,
+            user: {
+                userId: user.id,
+                userUuid: user.userUuid,
+                email: user.email,
+                roles: tokenPayload.roles
+            }
         };
     }
     catch (err) {
-        await logAuditEvent({
-            action: 'REFRESH_TOKEN_FAILED',
-            success: false,
-            ipAddress: meta?.ipAddress,
-            deviceInfo: meta?.deviceInfo,
-            userId: undefined
+        await database_1.prisma.auditLog.create({
+            data: {
+                action: "FAILED_REFRESH_TOKEN",
+                success: false,
+                ipAddress: meta.ipAddress,
+                userAgent: meta.deviceInfo ?? null,
+                userId: null
+            }
         });
+        console.error("Failed to refresh Token:", err);
+        throw err;
     }
 }

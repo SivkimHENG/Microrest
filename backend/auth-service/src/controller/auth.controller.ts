@@ -2,8 +2,6 @@ import { Response } from "express"
 import { StatusCodes } from "http-status-codes";
 import { userRegister, authenticated, logout, refreshNewToken } from "../service/auth.service";
 import { Request } from "express"
-import { success } from "zod";
-import { ref } from "process";
 
 
 

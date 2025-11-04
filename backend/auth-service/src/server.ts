@@ -4,7 +4,8 @@ import './config/passport.config'
 import router from "./routes/auth.router";
 import passport from "passport";
 import morgan from "morgan";
-
+import { startProducer } from "./kafka/producer.kafka";
+import { proccessOutboxEvents } from "./service/outbox.service";
 
 
 const app = express();
@@ -19,20 +20,17 @@ app.use(passport.initialize());
 app.use(morgan("combined"));
 
 
+
+(async function start() {
+  await startProducer();
+
+  setInterval(proccessOutboxEvents, 5000);
+})()
+
+
+
+
 app.use("/api/v1/auth", router);
-
-
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error("\n[ERROR] Controller Exception:");
-  console.error(`  → Path: ${req.method} ${req.originalUrl}`);
-  console.error(`  → Message: ${err.message}`);
-  if (err.stack) console.error(err.stack);
-
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
 
 
 const port = process.env.PORT || 5001;

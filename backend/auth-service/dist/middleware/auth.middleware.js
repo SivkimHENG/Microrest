@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hasRole = exports.authenticatedJWT = exports.isNotAuthenticated = exports.isAuthenticated = void 0;
+exports.hasRole = exports.authenticate = exports.isNotAuthenticated = exports.isAuthenticated = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const passport_1 = __importDefault(require("passport"));
 const isAuthenticated = (req, res, next) => {
@@ -36,7 +36,7 @@ const isNotAuthenticated = (req, res, next) => {
     }
 };
 exports.isNotAuthenticated = isNotAuthenticated;
-const authenticatedJWT = (req, res, next) => {
+const authenticate = (req, res, next) => {
     passport_1.default.authenticate('jwt', { session: false }, (err, user, info) => {
         if (err)
             return res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -44,13 +44,13 @@ const authenticatedJWT = (req, res, next) => {
             });
         if (!user)
             return res.status(http_status_codes_1.StatusCodes.UNAUTHORIZED).json({
-                message: "Unauthorized"
+                message: "User Unauthorized"
             });
         req.user = user;
         next();
     })(req, res, next);
 };
-exports.authenticatedJWT = authenticatedJWT;
+exports.authenticate = authenticate;
 const hasRole = (...roles) => {
     return (req, res, next) => {
         if (!req.isAuthenticated())
