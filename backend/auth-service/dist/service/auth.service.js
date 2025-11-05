@@ -12,31 +12,6 @@ const uuid_1 = require("uuid");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jwt_1 = require("../utils/jwt");
 const prisma_1 = require("../../generated/prisma");
-async function logAuditEvent(data) {
-    try {
-        var userId = null;
-        if (data.userId) {
-            const user = await database_1.prisma.userCredential.findUnique({
-                where: {
-                    id: data.userId
-                },
-                select: { id: true }
-            });
-            userId = user?.id || null;
-        }
-        await database_1.prisma.auditLog.create({
-            data: {
-                action: data.action,
-                success: data.success,
-                ipAddress: data.ipAddress,
-                userId
-            }
-        });
-    }
-    catch (err) {
-        console.error("Failed to log audit Event", err);
-    }
-}
 async function userRegister(email, password, meta) {
     try {
         const userUuid = (0, uuid_1.v4)();
@@ -44,13 +19,11 @@ async function userRegister(email, password, meta) {
         const refreshTokenRaw = (0, uuid_1.v4)();
         const refreshTokenHash = await bcrypt_1.default.hash(refreshTokenRaw, 12);
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const registrationId = (0, uuid_1.v4)();
+        const occurredAt = new Date().toISOString();
         const result = await database_1.prisma.$transaction(async (transaction) => {
             const user = await transaction.userCredential.create({
-                data: {
-                    email,
-                    passwordHash: hashed,
-                    userUuid,
-                },
+                data: { email, passwordHash: hashed, userUuid, },
             });
             await transaction.refreshToken.create({
                 data: {
@@ -62,10 +35,7 @@ async function userRegister(email, password, meta) {
                 }
             });
             await transaction.userRole.create({
-                data: {
-                    role: prisma_1.Roles.CUSTOMER,
-                    userId: user.id
-                }
+                data: { role: prisma_1.Roles.CUSTOMER, userId: user.id }
             });
             await transaction.auditLog.create({
                 data: {
@@ -74,6 +44,24 @@ async function userRegister(email, password, meta) {
                     ipAddress: meta.ipAddress,
                     userAgent: meta.deviceInfo ?? null,
                     userId: user.id,
+                }
+            });
+            await transaction.outbox.create({
+                data: {
+                    aggregateType: "User",
+                    aggregateId: user.userUuid,
+                    type: "UserRegistered",
+                    version: 1,
+                    payload: {
+                        event_id: registrationId,
+                        type: "UserRegistered",
+                        version: 1,
+                        occurred_at: occurredAt,
+                        user_id: user.id,
+                        user_uuid: user.userUuid,
+                        email: user.email,
+                        role: ["CUSTOMER"]
+                    }
                 }
             });
             return transaction.userCredential.findUnique({
@@ -107,66 +95,90 @@ async function userRegister(email, password, meta) {
 }
 async function authenticated(email, password, meta) {
     try {
-        const user = await database_1.prisma.userCredential.findUnique({
-            where: {
-                email: email
-            },
-            include: {
-                roles: true,
-                refreshTokens: true
+        const result = await database_1.prisma.$transaction(async (tx) => {
+            const authenticateId = (0, uuid_1.v4)();
+            const occurredAt = new Date().toISOString();
+            const user = await tx.userCredential.findUnique({
+                where: {
+                    email: email
+                },
+                include: {
+                    roles: true,
+                    refreshTokens: true
+                }
+            });
+            const isPasswordValid = user ?
+                await bcrypt_1.default.compare(password, user.passwordHash)
+                : await bcrypt_1.default.compare(password, "$2a$12$dummyhashtopreventtimingattack");
+            if (!user || !isPasswordValid) {
+                await tx.auditLog.create({
+                    data: {
+                        action: "LOGIN_FAILED",
+                        success: false,
+                        ipAddress: meta.ipAddress,
+                        userAgent: meta.deviceInfo ?? null,
+                        userId: user?.id ?? null,
+                    },
+                });
+                throw new Error("Invalid email or password");
             }
-        });
-        const isPasswordValid = user ?
-            await bcrypt_1.default.compare(password, user.passwordHash)
-            : await bcrypt_1.default.compare(password, "$2a$12$dummyhashtopreventtimingattack");
-        if (!user || !isPasswordValid) {
-            await database_1.prisma.auditLog.create({
+            const refreshTokenRaw = (0, jwt_1.generateRefreshToken)({ userId: user.id, userUuid: user.userUuid });
+            const refreshTokenHash = await bcrypt_1.default.hash(refreshTokenRaw, 12);
+            const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+            await tx.refreshToken.create({
                 data: {
-                    action: "LOGIN_FAILED",
-                    success: false,
+                    userId: user.id,
+                    tokenHash: refreshTokenHash,
+                    expiresAt,
                     ipAddress: meta.ipAddress,
-                    userAgent: meta.deviceInfo ?? null,
-                    userId: user?.id ?? null,
+                    deviceInfo: meta.deviceInfo ?? null,
                 },
             });
-            throw new Error("Invalid email or password");
-        }
-        const refreshTokenRaw = (0, jwt_1.generateRefreshToken)({ userId: user.id, userUuid: user.userUuid });
-        const refreshTokenHash = await bcrypt_1.default.hash(refreshTokenRaw, 12);
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-        await database_1.prisma.refreshToken.create({
-            data: {
-                userId: user.id,
-                tokenHash: refreshTokenHash,
-                expiresAt,
-                ipAddress: meta.ipAddress,
-                deviceInfo: meta.deviceInfo ?? null,
-            },
-        });
-        const accessToken = (0, jwt_1.generateAccessToken)({
-            userId: user.id,
-            userUuid: user.userUuid,
-            roles: user.roles.map((r) => r.role),
-        });
-        await database_1.prisma.auditLog.create({
-            data: {
-                action: "LOGIN_SUCCESS",
-                success: true,
-                ipAddress: meta.ipAddress,
-                userAgent: meta.deviceInfo ?? null,
-                userId: user.id,
-            },
-        });
-        return {
-            user: {
+            const accessToken = (0, jwt_1.generateAccessToken)({
                 userId: user.id,
                 userUuid: user.userUuid,
-                email: user.email,
-                roles: user.roles.map((r) => r.role)
-            },
-            accessToken,
-            refreshToken: refreshTokenRaw
-        };
+                roles: user.roles.map((r) => r.role),
+            });
+            await tx.auditLog.create({
+                data: {
+                    action: "LOGIN_SUCCESS",
+                    success: true,
+                    ipAddress: meta.ipAddress,
+                    userAgent: meta.deviceInfo ?? null,
+                    userId: user.id,
+                },
+            });
+            await tx.outbox.create({
+                data: {
+                    aggregateType: "User",
+                    aggregateId: user.userUuid,
+                    type: "UserAuthenticate",
+                    version: 1,
+                    payload: {
+                        event_id: authenticateId,
+                        type: "UserAuthenticate",
+                        version: 1,
+                        occurred_at: occurredAt,
+                        user_id: user.id,
+                        user_uuid: user.userUuid,
+                        email: user.email,
+                        username: user.email.split('@')[0],
+                        role: user.roles.map(r => r.role),
+                    }
+                }
+            });
+            return {
+                user: {
+                    userId: user.id,
+                    userUuid: user.userUuid,
+                    email: user.email,
+                    roles: user.roles.map((r) => r.role)
+                },
+                accessToken,
+                refreshToken: refreshTokenRaw
+            };
+        });
+        return result;
     }
     catch (err) {
         console.error("Login error:", err);
@@ -379,5 +391,30 @@ async function refreshNewToken(oldRefreshToken, meta) {
         });
         console.error("Failed to refresh Token:", err);
         throw err;
+    }
+}
+async function logAuditEvent(data) {
+    try {
+        var userId = null;
+        if (data.userId) {
+            const user = await database_1.prisma.userCredential.findUnique({
+                where: {
+                    id: data.userId
+                },
+                select: { id: true }
+            });
+            userId = user?.id || null;
+        }
+        await database_1.prisma.auditLog.create({
+            data: {
+                action: data.action,
+                success: data.success,
+                ipAddress: data.ipAddress,
+                userId
+            }
+        });
+    }
+    catch (err) {
+        console.error("Failed to log audit Event", err);
     }
 }

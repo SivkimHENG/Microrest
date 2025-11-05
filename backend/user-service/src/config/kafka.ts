@@ -1,5 +1,4 @@
 import { Kafka, logLevel } from "kafkajs";
-import { userService } from "../user/user.service";
 
 const brokers = process.env.KAFKA_BROKER?.split(",") || ["localhost:9092"];
 const clientId = "user-service";
@@ -8,12 +7,33 @@ const clientId = "user-service";
 export const kafka = new Kafka({
   clientId,
   brokers,
-  logLevel: logLevel.INFO
+  logLevel: logLevel.INFO,
+  retry: {
+    initialRetryTime: 300,
+    retries: 8,
+    maxRetryTime: 30000,
+    multiplier: 2
+  },
+  connectionTimeout: 10000,
+  requestTimeout: 30000,
+
 });
 
 
 
-export const consumer = kafka.consumer({ groupId: "user-service-group" });
+export const consumer = kafka.consumer({
+  groupId: "user-service-group",
+  sessionTimeout: 30000,
+  rebalanceTimeout: 60000,
+  heartbeatInterval: 3000,
+  maxWaitTimeInMs: 5000,
+  allowAutoTopicCreation: false,
+  retry: {
+    retries: 5,
+    initialRetryTime: 300
+  }
+
+});
 
 
 

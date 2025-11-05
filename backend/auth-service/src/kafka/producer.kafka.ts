@@ -5,8 +5,8 @@ import { kafka } from "../config/kafka.config";
 
 export const producer = kafka.producer({
   createPartitioner: Partitioners.DefaultPartitioner,
-  idempotent: true,
-  maxInFlightRequests: 1,
+  idempotent: false,
+  maxInFlightRequests: 5,
   retry: { retries: 5 }
 });
 

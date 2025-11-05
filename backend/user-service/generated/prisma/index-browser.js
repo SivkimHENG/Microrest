@@ -141,6 +141,20 @@ exports.Prisma.UserProfilesScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.LoginHistoryScalarFieldEnum = {
+  id: 'id',
+  userProfileId: 'userProfileId',
+  success: 'success',
+  action: 'action',
+  lastLoginAt: 'lastLoginAt',
+  lastLoginIp: 'lastLoginIp',
+  loginCount: 'loginCount',
+  ip_address: 'ip_address',
+  user_agent: 'user_agent',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.CustomerProfilesScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
@@ -182,6 +196,7 @@ exports.Status = exports.$Enums.Status = {
 exports.Prisma.ModelName = {
   ProccessedEvent: 'ProccessedEvent',
   UserProfiles: 'UserProfiles',
+  LoginHistory: 'LoginHistory',
   CustomerProfiles: 'CustomerProfiles',
   CustomerAddress: 'CustomerAddress'
 };

@@ -5,9 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
-  binaryTargets = ["native", "debian-openssl-1.1.x"]  
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -20,37 +20,58 @@ enum Status {
   INACTIVE
 }
 
-
 model ProccessedEvent {
   eventId     String   @id
   processedAt DateTime @default(now())
-  
+
   @@index([processedAt])
 }
 
 model UserProfiles {
-  id        Int       @id @default(autoincrement())
-  eventId   String    @unique @map("event_id") // track processed events
-  userId    Int       @unique @map("user_id")
-  userUuid  String    @unique @map("user_uuid") @db.Uuid
+  id       Int    @id @default(autoincrement())
+  eventId  String @unique @map("event_id") // track processed events
+  userId   Int    @unique @map("user_id")
+  userUuid String @unique @map("user_uuid") @db.Uuid
 
-  username     String  @db.VarChar(30)
-  email        String  @db.VarChar(50)
-  role         String  @db.VarChar(50)
-  profileUrl   String? @db.Text @map("profile_url")
-  bio          String? @db.VarChar(255)
-  phoneNumber  String? @db.VarChar(20) @map("phone_number")
+  username    String  @db.VarChar(30)
+  email       String  @db.VarChar(50)
+  role        String  @db.VarChar(50)
+  profileUrl  String? @map("profile_url") @db.Text
+  bio         String? @db.VarChar(255)
+  phoneNumber String? @map("phone_number") @db.VarChar(20)
 
   statuses Status[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("user_profiles")
+  loginHistory LoginHistory[]
 
   //  customer_perferences? CustomerPerference[]
   // customer_favorite?    CustomerFavorite[]
-   // user_log             UserActivityLog[]
+  // user_log             UserActivityLog[]
+
+  @@map("user_profiles")
+}
+
+model LoginHistory {
+  id Int @id @default(autoincrement())
+  userProfileId Int @map("user_profile_id")
+  success Boolean
+  action String
+  lastLoginAt DateTime?
+  lastLoginIp String?
+  loginCount  Int          @default(0)
+  ip_address  String?      @db.Inet
+  user_agent  String?      @db.Text
+  userProfile UserProfiles @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+
+  @@map("login_history")
+
 }
 
 model CustomerProfiles {
@@ -84,11 +105,8 @@ model CustomerAddress {
   city          String  @db.VarChar(100)
   khan          String  @db.VarChar(100)
 
-
-
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-
 }
 
 //model CustomerPerference {

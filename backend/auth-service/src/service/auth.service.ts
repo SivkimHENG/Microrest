@@ -7,7 +7,6 @@ import {
   verifyRefreshToken
 } from "../utils/jwt";
 import { Roles } from "../../generated/prisma";
-import { emitUserRegistrated } from "../events/domain.event";
 
 
 
@@ -121,86 +120,112 @@ export async function userRegister(email: string, password: string,
 
 
 
-
-
 export async function authenticated(email: string, password: string,
   meta: { ipAddress: string, deviceInfo: string }) {
   try {
-    const user = await prisma.userCredential.findUnique({
-      where: {
-        email: email
-      },
-      include: {
-        roles: true,
-        refreshTokens: true
+
+
+    const result = await prisma.$transaction(async (tx) => {
+      const authenticateId = uuidv4();
+      const occurredAt = new Date().toISOString();
+      const user = await tx.userCredential.findUnique({
+        where: {
+          email: email
+        },
+        include: {
+          roles: true,
+          refreshTokens: true
+        }
+      });
+
+      const isPasswordValid = user ?
+        await bcrypt.compare(password, user.passwordHash)
+        : await bcrypt.compare(password, "$2a$12$dummyhashtopreventtimingattack");
+
+      if (!user || !isPasswordValid) {
+        await tx.auditLog.create({
+          data: {
+            action: "LOGIN_FAILED",
+            success: false,
+            ipAddress: meta.ipAddress,
+            userAgent: meta.deviceInfo ?? null,
+            userId: user?.id ?? null,
+          },
+        });
+        throw new Error("Invalid email or password");
       }
-    });
 
+      const refreshTokenRaw
+        = generateRefreshToken({ userId: user.id, userUuid: user.userUuid });
+      const refreshTokenHash = await bcrypt.hash(refreshTokenRaw, 12);
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-
-    const isPasswordValid = user ?
-      await bcrypt.compare(password, user.passwordHash)
-      : await bcrypt.compare(password, "$2a$12$dummyhashtopreventtimingattack");
-
-
-
-
-    if (!user || !isPasswordValid) {
-      await prisma.auditLog.create({
+      await tx.refreshToken.create({
         data: {
-          action: "LOGIN_FAILED",
-          success: false,
+          userId: user.id,
+          tokenHash: refreshTokenHash,
+          expiresAt,
           ipAddress: meta.ipAddress,
-          userAgent: meta.deviceInfo ?? null,
-          userId: user?.id ?? null,
+          deviceInfo: meta.deviceInfo ?? null,
         },
       });
-      throw new Error("Invalid email or password");
-    }
 
-
-
-    const refreshTokenRaw
-      = generateRefreshToken({ userId: user.id, userUuid: user.userUuid });
-    const refreshTokenHash = await bcrypt.hash(refreshTokenRaw, 12);
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
-    await prisma.refreshToken.create({
-      data: {
-        userId: user.id,
-        tokenHash: refreshTokenHash,
-        expiresAt,
-        ipAddress: meta.ipAddress,
-        deviceInfo: meta.deviceInfo ?? null,
-      },
-    });
-
-    const accessToken = generateAccessToken({
-      userId: user.id,
-      userUuid: user.userUuid,
-      roles: user.roles.map((r) => r.role),
-    });
-
-    await prisma.auditLog.create({
-      data: {
-        action: "LOGIN_SUCCESS",
-        success: true,
-        ipAddress: meta.ipAddress,
-        userAgent: meta.deviceInfo ?? null,
-        userId: user.id,
-      },
-    });
-
-    return {
-      user: {
+      const accessToken = generateAccessToken({
         userId: user.id,
         userUuid: user.userUuid,
-        email: user.email,
-        roles: user.roles.map((r) => r.role)
-      },
-      accessToken,
-      refreshToken: refreshTokenRaw
-    };
+        roles: user.roles.map((r) => r.role),
+      });
+
+      await tx.auditLog.create({
+        data: {
+          action: "LOGIN_SUCCESS",
+          success: true,
+          ipAddress: meta.ipAddress,
+          userAgent: meta.deviceInfo ?? null,
+          userId: user.id,
+        },
+      });
+
+
+      await tx.outbox.create({
+        data: {
+          aggregateType: "User",
+          aggregateId: user.userUuid,
+          type: "UserAuthenticate",
+          version: 1,
+          payload: {
+            event_id: authenticateId,
+            type: "UserAuthenticate",
+            version: 1,
+            occurred_at: occurredAt,
+            user_id: user.id,
+            user_uuid: user.userUuid,
+            email: user.email,
+            username: user.email.split('@')[0],
+            role: user.roles.map(r => r.role),
+            last_login_at: new Date(),
+            login_count: 1,
+            ip_address: meta.ipAddress,
+            user_agent: "",
+          }
+        }
+      })
+
+      return {
+        user: {
+          userId: user.id,
+          userUuid: user.userUuid,
+          email: user.email,
+          roles: user.roles.map((r) => r.role)
+        },
+        accessToken,
+        refreshToken: refreshTokenRaw
+      };
+
+
+    });
+
+    return result;
 
 
   } catch (err: any) {

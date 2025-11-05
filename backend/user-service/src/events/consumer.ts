@@ -6,7 +6,7 @@ import { transformAuthEvent } from "./message.transformer";
 export async function startConsumer() {
   try {
     await consumer.connect();
-    await consumer.subscribe({ topic: "auth.user.event", fromBeginning: true });
+    await consumer.subscribe({ topic: "auth.user.event", fromBeginning: false });
 
     await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
@@ -14,19 +14,28 @@ export async function startConsumer() {
         try {
           const raw = JSON.parse(message.value!.toString());
 
+          console.log('📥 Received event:', JSON.stringify(raw, null, 2));
+          console.log('📋 Event type:', raw.type);
 
           const handler = EVENT_HANDLERS[raw.type];
+          console.log('🎯 Handler found:', !!handler);
+
           if (!handler) {
-            console.log(`No handler for event type: ${raw.type}`);
+            console.log(`❌ No handler for event type: "${raw.type}"`);
+            console.log('📚 Available handlers:', Object.keys(EVENT_HANDLERS));
             return;
           }
 
           const transformed = transformAuthEvent(raw);
 
+
+          console.log(transformed);
+
           const result = await handler(
             transformed?.eventId,
             transformed?.payload
           )
+
 
         } catch (err: any) {
           console.error("✗ ERROR:", err.message);

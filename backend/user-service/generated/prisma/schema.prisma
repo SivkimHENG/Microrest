@@ -45,11 +45,31 @@ model UserProfiles {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  loginHistory LoginHistory[]
+
   //  customer_perferences? CustomerPerference[]
   // customer_favorite?    CustomerFavorite[]
   // user_log             UserActivityLog[]
 
   @@map("user_profiles")
+}
+
+model LoginHistory {
+  id            Int          @id @default(autoincrement())
+  userProfileId Int          @map("user_profile_id")
+  success       Boolean
+  action        String
+  lastLoginAt   DateTime?
+  lastLoginIp   String?
+  loginCount    Int          @default(0)
+  ip_address    String?      @db.Inet
+  user_agent    String?      @db.Text
+  userProfile   UserProfiles @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("login_history")
 }
 
 model CustomerProfiles {

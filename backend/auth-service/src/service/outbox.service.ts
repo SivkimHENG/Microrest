@@ -1,6 +1,15 @@
 import { prisma } from "../database";
-import { emitUserRegistrated } from "../events/domain.event";
+import { userAuthenticated } from "../events/authenticate.event";
+import { userRegistrated } from "../events/register.event";
 
+
+type EventEmiiter = (payload: any) => Promise<void>;
+
+
+const EVENT_EMITTER: Record<string, EventEmiiter> = {
+  UserRegistered: userRegistrated,
+  UserAuthenticate: userAuthenticated,
+}
 
 export async function proccessOutboxEvents() {
   const event = await prisma.outbox.findMany({
@@ -10,13 +19,20 @@ export async function proccessOutboxEvents() {
   });
 
 
-
   for (const evt of event) {
+    const handler = EVENT_EMITTER[evt.type];
+    if (!handler) {
+      console.error(`Unknown event type: ${evt.type} for event ${evt.id}`)
+      await prisma.outbox.update({
+        where: { id: evt.id },
+        data: { status: "FAILED" }
+      });
+      continue;
+    }
+
     try {
-      if (evt.type === "UserRegistered")
-        await emitUserRegistrated(evt.payload);
 
-
+      await handler(evt.payload);
 
       await prisma.outbox.update({
         where: { id: evt.id },
@@ -24,7 +40,16 @@ export async function proccessOutboxEvents() {
       });
     } catch (err: any) {
       console.error(`Failed to send event ${evt.id}:`, err);
+      await prisma.outbox.update({
+        where: { id: evt.id },
+        data: {
+          status: "FAILED",
+        }
+      });
     }
 
   }
 }
+
+
+
