@@ -1,18 +1,21 @@
-
-export interface Address {
-  addressLine1: string
-  addressLine2?: string
-  city: string
-  sangkat: string
-  khan: string
-
-}
-
 export interface Meta {
-  ipAdress: string
+  ipAddress: string
   userAgent?: string
   deviceInfo?: string
 
+}
+
+
+export interface ProfileData {
+  userUuid: string
+  userId: number
+  username: string
+  email: string
+  bio: string
+  profileUrl: string
+  phoneNumber: string
+  address: string
+  status: string[]
 }
 
 
@@ -21,8 +24,17 @@ export interface UpdateProfile {
   userUuid: string
   username: string
   email: string
-  bio: string
-  profileUrl: string
-  phoneNumber: string
-  status: string[]
+  bio?: string
+  profileUrl?: string
+  phoneNumber?: string
+
+  customerProfileId: number
+  addressId: number
+  addressLine1: string
+  addressLine2?: string
+  city: string
+  sangkat: string
+  khan: string
+  [key: string]: any
+
 }

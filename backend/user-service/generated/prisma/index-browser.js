@@ -141,6 +141,38 @@ exports.Prisma.UserProfilesScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.CustomerProfilesScalarFieldEnum = {
+  id: 'id',
+  userUuid: 'userUuid',
+  customer_since: 'customer_since',
+  loyalty_points: 'loyalty_points',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.CustomerAddressScalarFieldEnum = {
+  id: 'id',
+  customerProfileId: 'customerProfileId',
+  address_line1: 'address_line1',
+  address_line2: 'address_line2',
+  city: 'city',
+  khan: 'khan',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.UserActivityLogScalarFieldEnum = {
+  id: 'id',
+  customerProfileId: 'customerProfileId',
+  action: 'action',
+  success: 'success',
+  message: 'message',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.LoginHistoryScalarFieldEnum = {
   id: 'id',
   userProfileId: 'userProfileId',
@@ -153,25 +185,6 @@ exports.Prisma.LoginHistoryScalarFieldEnum = {
   user_agent: 'user_agent',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
-};
-
-exports.Prisma.CustomerProfilesScalarFieldEnum = {
-  id: 'id',
-  user_id: 'user_id',
-  customer_since: 'customer_since',
-  loyalty_points: 'loyalty_points',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.CustomerAddressScalarFieldEnum = {
-  id: 'id',
-  address_line1: 'address_line1',
-  address_line2: 'address_line2',
-  city: 'city',
-  khan: 'khan',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
 };
 
 exports.Prisma.SortOrder = {
@@ -196,9 +209,10 @@ exports.Status = exports.$Enums.Status = {
 exports.Prisma.ModelName = {
   ProccessedEvent: 'ProccessedEvent',
   UserProfiles: 'UserProfiles',
-  LoginHistory: 'LoginHistory',
   CustomerProfiles: 'CustomerProfiles',
-  CustomerAddress: 'CustomerAddress'
+  CustomerAddress: 'CustomerAddress',
+  UserActivityLog: 'UserActivityLog',
+  LoginHistory: 'LoginHistory'
 };
 
 /**

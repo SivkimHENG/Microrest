@@ -49,6 +49,15 @@ export async function handleUserAuthenticate(
       }
 
 
+      const existingCustomer = await tx.userProfiles.findUnique({
+        where: { userUuid: payload.userUuid }
+      })
+
+      if (!existingCustomer) {
+        console.error(`Customer ${payload.userUuid} not found`);
+      }
+
+
 
       const authenticated = await tx.userProfiles.update({
         where: { userUuid: payload.userUuid },

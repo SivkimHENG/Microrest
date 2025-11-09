@@ -50,6 +50,17 @@ export async function handleUserRegistered(
         }
       });
 
+
+      await tx.customerProfiles.create({
+        data: {
+          userUuid: payload.userUuid,
+          loyalty_points: 0
+        }
+
+      });
+
+
+
       await tx.proccessedEvent.create({
         data: { eventId, processedAt: new Date() }
       });

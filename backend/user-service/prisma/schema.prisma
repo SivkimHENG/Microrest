@@ -47,12 +47,43 @@ model UserProfiles {
 
   loginHistory LoginHistory[]
 
-  //  customer_perferences? CustomerPerference[]
-  // customer_favorite?    CustomerFavorite[]
-  // user_log             UserActivityLog[]
-
   @@map("user_profiles")
+
 }
+
+
+model CustomerProfiles {
+  id             Int      @id @default(autoincrement())
+  userUuid       String   @unique @map("user_uuid") @db.Uuid 
+  customer_since DateTime @default(now())
+  loyalty_points Int      @default(0)
+
+  userLog UserActivityLog[]
+  address CustomerAddress[]
+
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("customer_profiles")
+}
+
+model CustomerAddress {
+  id            Int     @id @default(autoincrement())
+  customerProfileId Int @map("customer_profile_id")
+  address_line1 String? @db.VarChar(255)
+  address_line2 String? @db.VarChar(255)
+  city          String  @db.VarChar(100)
+  khan          String  @db.VarChar(100)
+
+ customerProfile CustomerProfiles @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  @@map("customer_addresses")
+}
+
+
 
 model LoginHistory {
   id Int @id @default(autoincrement())
@@ -74,15 +105,6 @@ model LoginHistory {
 
 }
 
-model CustomerProfiles {
-  id             Int      @id @default(autoincrement())
-  user_id        Int      @map("user_id")
-  customer_since DateTime @default(now())
-  loyalty_points Int      @default(0)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
 
 //model CustomerFavorite {
 //  id           Int @id @default(autoincrement())
@@ -98,40 +120,6 @@ model CustomerProfiles {
 //  updated_at DateTime @updatedAt
 //}
 
-model CustomerAddress {
-  id            Int     @id @default(autoincrement())
-  address_line1 String? @db.VarChar(255)
-  address_line2 String? @db.VarChar(255)
-  city          String  @db.VarChar(100)
-  khan          String  @db.VarChar(100)
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
 
-//model CustomerPerference {
-//  id                Int     @id @default(autoincrement())
-//  user_id           Int     @unique
-//  push_notification Boolean @default(true)
-//
-//  created_at DateTime @default(now())
-//  updated_at DateTime @updatedAt
-//
-//  userProfile UserProfiles @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-//}
-//
-//model UserActivityLog {
-//  id        Int     @id @default(autoincrement())
-//  user_id   Int     @unique
-//  user_uuid String  @unique @db.Uuid
-//  action    String  @db.VarChar(100)
-//  success   Boolean
-//  message   String  @db.VarChar(50)
-//
-//  ip_address String? @db.Inet
-//  user_agent String? @db.Text
-//
-//  created_at DateTime @default(now())
-//
-//  userProfile UserProfiles @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-//}
+

@@ -1,16 +1,35 @@
-FROM node:20-bullseye
-
+# ---------- Stage 1: Builder ----------
+FROM node:20-bullseye AS builder
 WORKDIR /app
 
-
+# Copy only package manifests first to leverage Docker layer caching
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
-
+# Copy Prisma schema and source files
+COPY prisma ./prisma
 COPY . .
 
+# Generate Prisma client at build time
+RUN npx prisma generate
 
+# Build your app (e.g., TypeScript -> JS)
+RUN npm run build
+
+# ---------- Stage 2: Runtime ----------
+FROM node:20-bullseye AS runtime
+WORKDIR /app
+
+# Set environment variables
+ENV NODE_ENV=production \
+    PORT=5002
+
+# Copy only the essentials from builder stage
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/dist ./dist
 
 EXPOSE 5002
 
-CMD ["sh", "-c", "npx prisma generate && npx prisma db push && npm run dev"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]

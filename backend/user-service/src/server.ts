@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import { startConsumer, stopConsumer } from "./events/consumer";
+import { router } from "./customer/customer.routes";
 
 dotenv.config();
 
@@ -15,6 +16,12 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(cors());
 app.use(morgan("combined"));
+
+
+
+app.use("/api/v1", router);
+
+
 
 
 app.listen(PORT, () => {
