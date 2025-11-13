@@ -11,12 +11,6 @@ interface AuthRequest extends Request {
 }
 
 
-interface CategoryRequest extends Request {
-  category: {
-    id: number
-  }
-
-}
 
 class CategoryController {
 
@@ -42,7 +36,7 @@ class CategoryController {
   }
 
 
-  async update(req: CategoryRequest, res: Response) {
+  async update(req: Request, res: Response) {
     try {
       const data = req.body;
 
@@ -69,12 +63,46 @@ class CategoryController {
       });
 
     } catch (err: any) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         error: err.message
       });
     }
 
   }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const id = Number(req.params.id);
+
+      if (isNaN(id)) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          message: "Invalid category ID",
+        });
+      }
+
+      if (!id) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          message: "Required id for update"
+        });
+      }
+
+      await categoryService.deleteCategory(id);
+
+      return res.status(StatusCodes.OK).json({
+        message: "Admin deleting category successfully",
+        data: []
+      });
+
+
+    } catch (err: any) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        error: err.message
+      });
+    }
+
+
+  }
+
 
 }
 

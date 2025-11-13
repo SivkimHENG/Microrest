@@ -1,39 +1,9 @@
 import { Producer } from "kafkajs"
-
-interface CategoryData {
-  category_name: string
-  description: string
-  updatedBy: string
-  updatedAt: string
-}
-
-interface CategoryUpdatedEvent {
-  eventId: string
-  id: number
-  categoryUuid: string
-  category_name?: string
-  description: string
-  updatedBy: string
-  updatedAt: Date
-  type: "CategoryUpdated"
-  changes: {
-    before: Partial<CategoryData>,
-    after: Partial<CategoryData>
-  }
-}
-
-interface CategoryCreatedEvent {
-  eventId: string
-  categoryUuid: string
-  category_name?: string
-  description: string
-  createdBy: string
-  createdAt: Date
-  updatedBy: string
-  updatedAt: Date
-  type: "CategoryCreated"
-}
-
+import {
+  CategoryCreatedEvent,
+  CategoryDeletedEvent,
+  CategoryUpdatedEvent
+} from "../../utils/interface.utils";
 
 
 export class CategoryPublisher {
@@ -92,12 +62,23 @@ export class CategoryPublisher {
   }
 
 
-  async deleteCategory() {
+  async deleteCategory(event: CategoryDeletedEvent) {
+    try {
+      await this.publisher.send({
+        topic: "user.management.event",
+        messages: [{
+          key: event.categoryUuid,
+          value: JSON.stringify(event),
+          headers: { eventType: event.type }
+        }]
+      });
+
+    } catch (err: any) {
+      console.error(`Failed to publish CategoryDeleted event: ${err.message}`);
+      throw err;
+    }
 
   }
-
-
-
 }
 
 

@@ -1,40 +1,11 @@
 import { producer } from "../../config/kafka";
 import { v4 as uuidv4 } from "uuid";
 import { CategoryPublisher } from "../../events/publisher/category.producer";
-
-interface CategoryData {
-  category_name: string;
-  description: string;
-  updatedBy: string;
-  updatedAt: string;
-}
-interface CategoryUpdatedEvent {
-  id: number
-  eventId: string
-  categoryUuid: string
-  category_name?: string
-  description: string
-  updatedBy: string
-  updatedAt: Date
-  type: "CategoryUpdated"
-  changes: {
-    before: Partial<CategoryData>
-    after: Partial<CategoryData>
-
-  }
-}
-
-interface CategoryCreatedEvent {
-  eventId: string
-  categoryUuid: string
-  category_name?: string
-  description: string
-  createdBy: string
-  createdAt: Date
-  updatedBy: string
-  updatedAt: Date
-  type: "CategoryCreated"
-}
+import {
+  CategoryCreatedEvent,
+  CategoryDeletedEvent,
+  CategoryUpdatedEvent
+} from "../../utils/interface.utils";
 
 
 class CategoryService {
@@ -88,8 +59,20 @@ class CategoryService {
   }
 
 
+  async deleteCategory(categoryId: number) {
+    const event: CategoryDeletedEvent = {
+      eventId: uuidv4(),
+      categoryUuid: uuidv4(),
+      id: categoryId,
+      deletedBy: "ADMIN",
+      deletedAt: new Date(),
+      type: "CategoryDeleted"
+    }
 
+    await this.publisher.deleteCategory(event);
+    return event;
 
+  }
 
 }
 

@@ -16,9 +16,9 @@ export class CategoryConsumer extends BaseConsumer {
       const value = message.value.toString();
       const eventData = JSON.parse(value);
 
-      // console.log('=== RAW EVENT DATA ===');
-      //console.log(JSON.stringify(eventData, null, 2));
-      // console.log('=====================');
+      console.log('=== RAW EVENT DATA ===');
+      console.log(JSON.stringify(eventData, null, 2));
+      console.log('=====================');
 
       console.log('Processing category:', {
         type: eventData.type,

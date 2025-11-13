@@ -113,7 +113,36 @@ class CategoryHandlers {
   }
 
   async delete(event: any) {
+    try {
+      const categoryId = Number(event.id);
 
+      const alreadyProcessed = await prisma.proccessedEvent.findUnique({
+        where: { eventId: event.eventId }
+      });
+
+
+      if (alreadyProcessed) {
+        console.log(`Event ${event.eventId} alreadyProcessed, skipping.`)
+        return;
+      }
+
+      const existingCatgory = await prisma.categories.findUnique({
+        where: { id: categoryId }
+      });
+
+
+      if (!existingCatgory) {
+        throw new Error(`Category with id ${categoryId} not found`);
+      }
+
+      await prisma.categories.delete({
+        where: { id: categoryId },
+      });
+
+    } catch (err: any) {
+      console.error(err.message);
+      throw err;
+    }
   }
 
 }
