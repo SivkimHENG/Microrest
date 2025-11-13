@@ -93,6 +93,36 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.MenuItemScalarFieldEnum = {
+  id: 'id',
+  itemUuid: 'itemUuid',
+  menuItem_name: 'menuItem_name',
+  description: 'description',
+  basePrice: 'basePrice',
+  imageUrl: 'imageUrl',
+  displayOrder: 'displayOrder',
+  isAvailable: 'isAvailable',
+  categoryId: 'categoryId',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MenuItemCategoriesScalarFieldEnum = {
+  menuItemId: 'menuItemId',
+  categoryId: 'categoryId'
+};
+
+exports.Prisma.MenuItemVariationScalarFieldEnum = {
+  id: 'id',
+  size_name: 'size_name',
+  menuItemId: 'menuItemId',
+  priceAdjustment: 'priceAdjustment',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.CategoriesScalarFieldEnum = {
   id: 'id',
   categoryUuid: 'categoryUuid',
@@ -147,6 +177,9 @@ exports.Prisma.JsonNullValueFilter = {
 
 
 exports.Prisma.ModelName = {
+  MenuItem: 'MenuItem',
+  MenuItemCategories: 'MenuItemCategories',
+  MenuItemVariation: 'MenuItemVariation',
   Categories: 'Categories',
   Outbox: 'Outbox',
   ProccessedEvent: 'ProccessedEvent'
@@ -162,7 +195,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/app/generated/prisma",
+      "value": "/home/hengsivkim/Personal/microrest/backend/menu-service/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -171,7 +204,7 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "debian-openssl-1.1.x",
+        "value": "debian-openssl-3.0.x",
         "native": true
       },
       {
@@ -180,7 +213,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/app/prisma/schema.prisma",
+    "sourceFilePath": "/home/hengsivkim/Personal/microrest/backend/menu-service/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -202,13 +235,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../generated/prisma\"\n  binaryTargets = [\"native\", \"debian-openssl-1.1.x\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Categories {\n  id            Int     @id @default(autoincrement())\n  categoryUuid  String  @unique @db.Uuid\n  category_name String? @db.VarChar(100)\n  description   String? @db.VarChar(100)\n\n  createdBy String?\n  updatedBy String?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"categories\")\n}\n\nmodel Outbox {\n  id            String   @id @default(cuid())\n  aggregateType String\n  aggregateId   String\n  type          String\n  version       Int\n  payload       Json\n  occurredAt    DateTime @default(now())\n  status        String   @default(\"PENDING\")\n\n  @@map(\"outbox\")\n}\n\nmodel ProccessedEvent {\n  eventId     String   @id\n  processedAt DateTime @default(now())\n\n  @@index([processedAt])\n}\n",
-  "inlineSchemaHash": "7efe5c12cfcfbffaf39ac80e6fb2563d944d96ce0fd8b62ce2c64704e1b64ef9",
+  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../generated/prisma\"\n  binaryTargets = [\"native\", \"debian-openssl-1.1.x\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel MenuItem {\n  id            Int     @id @default(autoincrement())\n  itemUuid      String  @unique @db.Uuid\n  menuItem_name String  @unique @db.VarChar(100)\n  description   String? @db.VarChar(500)\n  basePrice     Decimal @db.Decimal(10, 2)\n  imageUrl      String? @db.VarChar(255)\n  displayOrder  Int     @default(0)\n  isAvailable   Boolean @default(false)\n  categoryId    Int\n\n  menuItemVariant    MenuItemVariation[]\n  menuItemCategories MenuItemCategories[]\n\n  createdBy String? @db.VarChar(100)\n  updatedBy String? @db.VarChar(100)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"menu_items\")\n}\n\nmodel MenuItemCategories {\n  menuItemId Int\n  categoryId Int\n  menuItem   MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)\n  category   Categories @relation(fields: [categoryId], references: [id], onDelete: Cascade)\n\n  @@id([menuItemId, categoryId])\n  @@map(\"menu_item_category\")\n}\n\nmodel MenuItemVariation {\n  id              Int      @id @default(autoincrement())\n  size_name       String?  @db.VarChar(50)\n  menuItemId      Int\n  priceAdjustment Decimal  @db.Decimal(10, 2)\n  menuItem        MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"menu_items_variation\")\n}\n\nmodel Categories {\n  id            Int     @id @default(autoincrement())\n  categoryUuid  String  @unique @db.Uuid\n  category_name String? @db.VarChar(100)\n  description   String? @db.VarChar(100)\n\n  menuItemCategories MenuItemCategories[]\n\n  createdBy String?\n  updatedBy String?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"categories\")\n}\n\nmodel Outbox {\n  id            String   @id @default(cuid())\n  aggregateType String\n  aggregateId   String\n  type          String\n  version       Int\n  payload       Json\n  occurredAt    DateTime @default(now())\n  status        String   @default(\"PENDING\")\n\n  @@map(\"outbox\")\n}\n\nmodel ProccessedEvent {\n  eventId     String   @id\n  processedAt DateTime @default(now())\n\n  @@index([processedAt])\n}\n",
+  "inlineSchemaHash": "9e8d37964f4e6ba4b18a7fb212d6e04c7b9c0bf5830ce88c0d72460e01205214",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Categories\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"categoryUuid\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdBy\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"updatedBy\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"categories\"},\"Outbox\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"aggregateType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"aggregateId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"version\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"payload\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"occurredAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":\"outbox\"},\"ProccessedEvent\":{\"fields\":[{\"name\":\"eventId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"processedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"MenuItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"itemUuid\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"menuItem_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"basePrice\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"imageUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"displayOrder\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"isAvailable\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"categoryId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"menuItemVariant\",\"kind\":\"object\",\"type\":\"MenuItemVariation\",\"relationName\":\"MenuItemToMenuItemVariation\"},{\"name\":\"menuItemCategories\",\"kind\":\"object\",\"type\":\"MenuItemCategories\",\"relationName\":\"MenuItemToMenuItemCategories\"},{\"name\":\"createdBy\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"updatedBy\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"menu_items\"},\"MenuItemCategories\":{\"fields\":[{\"name\":\"menuItemId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"categoryId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"menuItem\",\"kind\":\"object\",\"type\":\"MenuItem\",\"relationName\":\"MenuItemToMenuItemCategories\"},{\"name\":\"category\",\"kind\":\"object\",\"type\":\"Categories\",\"relationName\":\"CategoriesToMenuItemCategories\"}],\"dbName\":\"menu_item_category\"},\"MenuItemVariation\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"size_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"menuItemId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"priceAdjustment\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"menuItem\",\"kind\":\"object\",\"type\":\"MenuItem\",\"relationName\":\"MenuItemToMenuItemVariation\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"menu_items_variation\"},\"Categories\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"categoryUuid\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"menuItemCategories\",\"kind\":\"object\",\"type\":\"MenuItemCategories\",\"relationName\":\"CategoriesToMenuItemCategories\"},{\"name\":\"createdBy\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"updatedBy\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"categories\"},\"Outbox\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"aggregateType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"aggregateId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"version\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"payload\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"occurredAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":\"outbox\"},\"ProccessedEvent\":{\"fields\":[{\"name\":\"eventId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"processedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

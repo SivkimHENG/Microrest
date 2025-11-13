@@ -1,11 +1,16 @@
 import { categoryHandlers } from "./categoryHandlers";
+import { menuItemHandler } from "./menu-items.handler";
 
 type EventHandler = ((event: any) => Promise<any>)
 
 const eventHandlers: Record<string, EventHandler> = {
   'CategoryCreated': categoryHandlers.create,
   'CategoryUpdated': categoryHandlers.update,
-  'CategoryDeleted': categoryHandlers.delete
+  'CategoryDeleted': categoryHandlers.delete,
+
+  'MenuItemCreated': menuItemHandler.create
+
+
 
 }
 

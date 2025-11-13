@@ -1,11 +1,13 @@
 import { producer } from "../../config/kafka";
 import { prisma } from "../../database"
 import { CategoryPublisher } from "./category.producer"
+import { MenuItemPublisher } from "./menuItem.producer";
 
 
 type EventEmitter = (payload: any) => Promise<void>
 
 const categoryPublisher = new CategoryPublisher(producer);
+const menuItemPublisher = new MenuItemPublisher(producer);
 
 
 
@@ -13,6 +15,10 @@ const EVENT_EMITTER: Record<string, EventEmitter> = {
   CategoryCreated: async (payload) => {
     await categoryPublisher.createCategory(payload);
     await categoryPublisher.updateCategory(payload);
+  },
+  MenuItem: async (payload) => {
+    await menuItemPublisher.createMenuItem(payload);
+
   }
 }
 

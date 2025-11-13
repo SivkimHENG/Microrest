@@ -1,5 +1,6 @@
 import { producer } from "../../config/kafka";
 import { CategoryPublisher } from "./category.producer";
+import { MenuItemPublisher } from "./menuItem.producer";
 
 interface KafkaProducer {
   connect(): Promise<void>
@@ -34,7 +35,8 @@ class PublisherRegistry {
 
 
 export const publisherRegistry = new PublisherRegistry([
-  new CategoryPublisher(producer)
+  new CategoryPublisher(producer),
+  new MenuItemPublisher(producer)
 ]);
 
 

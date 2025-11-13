@@ -9,17 +9,64 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Categories {
-  id Int @id @default(autoincrement())
-  categoryUuid String @db.Uuid @unique
-  category_name String? @db.VarChar(100)
-  description String?  @db.VarChar(100)
+model MenuItem {
+  id            Int          @id @default(autoincrement())
+  itemUuid      String       @unique @db.Uuid
+  menuItem_name String       @unique @db.VarChar(100)
+  description   String?      @db.VarChar(500)
+  basePrice     Decimal      @db.Decimal(10, 2)
+  imageUrl      String?      @db.VarChar(255)
+  displayOrder  Int          @default(0)
+  isAvailable   Boolean      @default(false)
+  categoryId    Int
 
-  createdBy String? 
-  updatedBy String?
+  menuItemVariant MenuItemVariation[]
+  menuItemCategories MenuItemCategories[]
 
-  createdAt DateTime @default(now()) 
+  createdBy String? @db.VarChar(100)
+  updatedBy String? @db.VarChar(100)
+
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@map("menu_items")
+}
+
+model MenuItemCategories {
+  menuItemId Int
+  categoryId Int
+  menuItem   MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  category   Categories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([menuItemId, categoryId])
+  @@map("menu_item_category")
+}
+
+model MenuItemVariation {
+  id              Int      @id @default(autoincrement())
+  size_name       String?  @db.VarChar(50)
+  menuItemId      Int
+  priceAdjustment Decimal  @db.Decimal(10, 2)
+  menuItem        MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("menu_items_variation")
+}
+
+model Categories {
+  id            Int     @id @default(autoincrement())
+  categoryUuid  String  @unique @db.Uuid
+  category_name String? @db.VarChar(100)
+  description   String? @db.VarChar(100)
+
+  menuItemCategories MenuItemCategories[]
+
+  createdBy String?
+  updatedBy String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 
   @@map("categories")
 }
@@ -37,10 +84,11 @@ model Outbox {
   @@map("outbox")
 }
 
-
 model ProccessedEvent {
   eventId     String   @id
   processedAt DateTime @default(now())
 
   @@index([processedAt])
 }
+
+

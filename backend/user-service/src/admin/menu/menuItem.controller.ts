@@ -1,0 +1,32 @@
+import { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import { menuItemService } from "./menuItem.service";
+
+
+
+export class MenuItemController {
+
+
+  async create(req: Request, res: Response): Promise<any> {
+    try {
+      const data = req.body;
+      if (!data) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          message: "Required field for create menu-item"
+        });
+      }
+
+      const created = await menuItemService.create(data)
+      return res.status(StatusCodes.CREATED).json({
+        message: "Admin creating MenuItem successfully",
+        data: created
+      });
+    } catch (err: any) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        error: err.message
+      });
+    }
+  }
+}
+
+export const menuItemController = new MenuItemController();

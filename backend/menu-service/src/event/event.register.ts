@@ -1,8 +1,10 @@
 import { CategoryConsumer } from "./consumer/categoryConsumer";
+import { MenuItemsConsumer } from "./consumer/menu-items.consumer";
 
 class EventRegistry {
   private consumers = [
     new CategoryConsumer(),
+    new MenuItemsConsumer(),
   ];
 
   async startAll() {

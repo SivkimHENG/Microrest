@@ -41,3 +41,38 @@ export interface CategoryDeletedEvent {
   deletedAt: Date
   type: "CategoryDeleted"
 }
+
+
+export interface MenuItemCreatedEvent {
+  eventId: string
+  itemUuid: string
+  id: number
+  menuItem_name: string
+  description: string
+  basePrice: number
+  imageUrl: string
+  displayOrder: number
+  isAvailable: boolean
+  createdBy: string
+  createdAt: Date
+
+  menuItemVariant: {
+    menuItemVariantId: number
+    size_name: string
+    priceAdjustment: number
+  }
+
+  category: {
+    categoryId: number
+    categoryUuid: string
+    category_name: string
+    description: string
+  }
+  type: "MenuItemCreated"
+
+}
+
+
+
+
+

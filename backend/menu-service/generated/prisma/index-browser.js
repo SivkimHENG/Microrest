@@ -121,6 +121,36 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.MenuItemScalarFieldEnum = {
+  id: 'id',
+  itemUuid: 'itemUuid',
+  menuItem_name: 'menuItem_name',
+  description: 'description',
+  basePrice: 'basePrice',
+  imageUrl: 'imageUrl',
+  displayOrder: 'displayOrder',
+  isAvailable: 'isAvailable',
+  categoryId: 'categoryId',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MenuItemCategoriesScalarFieldEnum = {
+  menuItemId: 'menuItemId',
+  categoryId: 'categoryId'
+};
+
+exports.Prisma.MenuItemVariationScalarFieldEnum = {
+  id: 'id',
+  size_name: 'size_name',
+  menuItemId: 'menuItemId',
+  priceAdjustment: 'priceAdjustment',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.CategoriesScalarFieldEnum = {
   id: 'id',
   categoryUuid: 'categoryUuid',
@@ -175,6 +205,9 @@ exports.Prisma.JsonNullValueFilter = {
 
 
 exports.Prisma.ModelName = {
+  MenuItem: 'MenuItem',
+  MenuItemCategories: 'MenuItemCategories',
+  MenuItemVariation: 'MenuItemVariation',
   Categories: 'Categories',
   Outbox: 'Outbox',
   ProccessedEvent: 'ProccessedEvent'

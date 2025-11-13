@@ -7,6 +7,7 @@ import { router } from "./customer/customer.routes";
 import { categoryRouter } from "./admin/category/category.routes";
 import { publisherRegistry } from "./events/publisher/publisher.registry";
 import { processOutboxEvent } from "./events/publisher/outbox";
+import { menuItemRouter } from "./admin/menu/menuItem.routes";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(morgan("combined"));
 
 app.use("/api/v1", router);
 app.use("/api/v1/admin", categoryRouter);
+app.use("/api/v1/admin", menuItemRouter)
 
 
 
