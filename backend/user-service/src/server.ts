@@ -4,6 +4,9 @@ import cors from "cors";
 import morgan from "morgan";
 import { startConsumer, stopConsumer } from "./events/consumer";
 import { router } from "./customer/customer.routes";
+import { categoryRouter } from "./admin/category/category.routes";
+import { publisherRegistry } from "./events/publisher/publisher.registry";
+import { processOutboxEvent } from "./events/publisher/outbox";
 
 dotenv.config();
 
@@ -20,6 +23,7 @@ app.use(morgan("combined"));
 
 
 app.use("/api/v1", router);
+app.use("/api/v1/admin", categoryRouter);
 
 
 
@@ -29,7 +33,14 @@ app.listen(PORT, () => {
 });
 
 
-startConsumer().catch(console.error);
+
+
+async function start() {
+  await startConsumer().catch(console.error);
+  await publisherRegistry.startAll().catch(console.error);
+  setInterval(processOutboxEvent, 5000);
+}
+start();
 
 
 const shutdown = async (signal: string) => {
@@ -43,6 +54,9 @@ const shutdown = async (signal: string) => {
     process.exit(1);
   }
 }
+
+
+
 
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));

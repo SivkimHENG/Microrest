@@ -14,6 +14,43 @@ interface AuthRequest extends Request {
 
 class CustomerController {
 
+
+  async searchProfile(req: AuthRequest, res: Response) {
+    try {
+
+      const username = req.query.username as string;
+
+      if (!username) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          message: "Username required in order to searching..."
+        });
+
+      }
+
+      const searched = await customerService.searchProfile(username);
+
+      if (!searched) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+          message: "Authenticated for search profile <USERNAME>",
+        })
+
+      }
+
+      return res.status(StatusCodes.OK).json({
+        message: "Searching successfully...",
+        data: searched
+      });
+
+    } catch (err: any) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        error: err.message,
+      });
+    }
+
+
+  }
+
+
   async getProfile(req: AuthRequest, res: Response) {
     try {
 

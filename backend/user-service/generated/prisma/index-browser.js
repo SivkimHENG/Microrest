@@ -120,6 +120,17 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.OutboxScalarFieldEnum = {
+  id: 'id',
+  aggregateType: 'aggregateType',
+  aggregateId: 'aggregateId',
+  type: 'type',
+  version: 'version',
+  payload: 'payload',
+  occurredAt: 'occurredAt',
+  status: 'status'
+};
+
 exports.Prisma.ProccessedEventScalarFieldEnum = {
   eventId: 'eventId',
   processedAt: 'processedAt'
@@ -161,18 +172,6 @@ exports.Prisma.CustomerAddressScalarFieldEnum = {
   updated_at: 'updated_at'
 };
 
-exports.Prisma.UserActivityLogScalarFieldEnum = {
-  id: 'id',
-  customerProfileId: 'customerProfileId',
-  action: 'action',
-  success: 'success',
-  message: 'message',
-  ipAddress: 'ipAddress',
-  userAgent: 'userAgent',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
 exports.Prisma.LoginHistoryScalarFieldEnum = {
   id: 'id',
   userProfileId: 'userProfileId',
@@ -192,9 +191,19 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 
 exports.Prisma.NullsOrder = {
@@ -207,11 +216,11 @@ exports.Status = exports.$Enums.Status = {
 };
 
 exports.Prisma.ModelName = {
+  Outbox: 'Outbox',
   ProccessedEvent: 'ProccessedEvent',
   UserProfiles: 'UserProfiles',
   CustomerProfiles: 'CustomerProfiles',
   CustomerAddress: 'CustomerAddress',
-  UserActivityLog: 'UserActivityLog',
   LoginHistory: 'LoginHistory'
 };
 

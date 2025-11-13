@@ -1,0 +1,45 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Categories {
+  id            Int     @id @default(autoincrement())
+  categoryUuid  String  @unique @db.Uuid
+  category_name String? @db.VarChar(100)
+  description   String? @db.VarChar(100)
+
+  createdBy String?
+  updatedBy String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model Outbox {
+  id            String   @id @default(cuid())
+  aggregateType String
+  aggregateId   String
+  type          String
+  version       Int
+  payload       Json
+  occurredAt    DateTime @default(now())
+  status        String   @default("PENDING")
+
+  @@map("outbox")
+}
+
+model ProccessedEvent {
+  eventId     String   @id
+  processedAt DateTime @default(now())
+
+  @@index([processedAt])
+}

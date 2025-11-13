@@ -20,6 +20,19 @@ enum Status {
   INACTIVE
 }
 
+model Outbox {
+  id            String   @id @default(cuid())
+  aggregateType String
+  aggregateId   String
+  type          String
+  version       Int
+  payload       Json
+  occurredAt    DateTime @default(now())
+  status        String   @default("PENDING")
+
+  @@index([status, occurredAt])
+}
+
 model ProccessedEvent {
   eventId     String   @id
   processedAt DateTime @default(now())
@@ -56,7 +69,6 @@ model CustomerProfiles {
   customer_since DateTime @default(now())
   loyalty_points Int      @default(0)
 
-  userLog UserActivityLog[]
   address CustomerAddress[]
 
   created_at DateTime @default(now())
@@ -79,23 +91,6 @@ model CustomerAddress {
   updated_at DateTime @updatedAt
 
   @@map("customer_addresses")
-}
-
-model UserActivityLog {
-  id                Int     @id @default(autoincrement())
-  customerProfileId Int     @map("customer_profile_id")
-  action            String  @db.VarChar(100)
-  success           Boolean
-  message           String  @db.VarChar(50)
-
-  customerProfile CustomerProfiles @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
-
-  ipAddress String?  @db.Inet
-  userAgent String?  @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("user_activity_log")
 }
 
 model LoginHistory {
@@ -128,15 +123,4 @@ model LoginHistory {
 //
 //  created_at DateTime @default(now())
 //  updated_at DateTime @updatedAt
-//}
-
-//model CustomerPerference {
-//  id                Int     @id @default(autoincrement())
-//  user_id           Int     @unique
-//  push_notification Boolean @default(true)
-//
-//  created_at DateTime @default(now())
-//  updated_at DateTime @updatedAt
-//
-//  userProfile UserProfiles @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 //}

@@ -1,4 +1,4 @@
-import { Kafka, logLevel } from "kafkajs";
+import { Kafka, logLevel, Partitioners } from "kafkajs";
 
 const brokers = process.env.KAFKA_BROKER?.split(",") || ["localhost:9092"];
 const clientId = "user-service";
@@ -20,6 +20,10 @@ export const kafka = new Kafka({
 });
 
 
+export const producer = kafka.producer({
+  allowAutoTopicCreation: true,
+  transactionTimeout: 30000,
+});
 
 export const consumer = kafka.consumer({
   groupId: "user-service-group",

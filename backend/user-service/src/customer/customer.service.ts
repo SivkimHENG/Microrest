@@ -1,7 +1,32 @@
-import { consumer } from "../config/kafka";
 import { prisma } from "../database"
 import { Meta, ProfileData, UpdateProfile } from "./utils/interface";
 class CustomerService {
+
+  async searchProfile(username: string) {
+    try {
+      const searched = await prisma.userProfiles.findMany({
+        where: {
+          username: {
+            contains: username,
+            mode: 'insensitive'
+          }
+        },
+      })
+
+      if (!searched || searched.length === 0) {
+        console.log(`User with ${searched} with not existed`);
+        throw Error;
+      }
+
+      return searched;
+
+    } catch (err: any) {
+      console.error(err.message);
+      throw err;
+    }
+
+  }
+
 
 
   async getProfile(userUuid: string, payload: ProfileData, meta: Meta) {
@@ -140,6 +165,7 @@ class CustomerService {
     }
 
   }
+
 
 
 

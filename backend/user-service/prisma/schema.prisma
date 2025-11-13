@@ -20,6 +20,18 @@ enum Status {
   INACTIVE
 }
 
+model Outbox {
+  id            String   @id @default(cuid())
+  aggregateType String
+  aggregateId   String
+  type          String
+  version       Int
+  payload       Json
+  occurredAt    DateTime @default(now())
+  status        String   @default("PENDING")
+
+  @@index([status, occurredAt])
+}
 model ProccessedEvent {
   eventId     String   @id
   processedAt DateTime @default(now())
@@ -58,7 +70,6 @@ model CustomerProfiles {
   customer_since DateTime @default(now())
   loyalty_points Int      @default(0)
 
-  userLog UserActivityLog[]
   address CustomerAddress[]
 
 
