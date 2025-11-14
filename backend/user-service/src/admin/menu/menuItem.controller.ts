@@ -27,6 +27,60 @@ export class MenuItemController {
       });
     }
   }
+
+  async update(req: Request, res: Response) {
+    try {
+      const data = req.body;
+      const { uuid } = req.params;
+
+      if (!uuid) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          message: "Required uuid for update menu"
+        });
+      }
+
+
+      const updated = await menuItemService.update(uuid, data);
+
+      return res.status(StatusCodes.OK).json({
+        message: "Admin updating Menu Items successfully",
+        data: updated
+      });
+
+
+    } catch (err: any) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        error: err.message
+      });
+    }
+  }
+  async delete(req: Request, res: Response) {
+    try {
+
+      const { uuid } = req.params;
+
+      if (!uuid) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          message: "required uuid for delete menu"
+        });
+
+      }
+      await menuItemService.delete(uuid);
+      return res.status(StatusCodes.OK).json({
+        message: "Admin updating Menu Items successfully",
+        data: []
+      });
+
+    } catch (err: any) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        error: err.message
+      });
+    }
+
+  }
+
+
 }
+
 
 export const menuItemController = new MenuItemController();

@@ -44,8 +44,8 @@ model MenuItemCategories {
 
 model MenuItemVariation {
   id              Int      @id @default(autoincrement())
-  size_name       String?  @db.VarChar(50)
   menuItemId      Int
+  size_name       String?  @db.VarChar(50)
   priceAdjustment Decimal  @db.Decimal(10, 2)
   menuItem        MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
 

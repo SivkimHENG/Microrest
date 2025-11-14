@@ -4,36 +4,19 @@ import {
   CategoryDeletedEvent,
   CategoryUpdatedEvent
 } from "../../utils/interface.utils";
+import { BaseProducer } from "./base.publisher";
 
 
-export class CategoryPublisher {
-  private publisher: Producer;
+export class CategoryPublisher extends BaseProducer {
 
-  constructor(publisher: Producer) {
-    this.publisher = publisher;
-  }
-
-
-  async connect(): Promise<void> {
-    await this.publisher.connect();
-  }
-
-  async disconnect(): Promise<void> {
-    await this.publisher.disconnect();
+  constructor(producer: Producer) {
+    super(producer, 'user.management.event');
   }
 
 
   async createCategory(event: CategoryCreatedEvent) {
     try {
-      await this.publisher.send({
-
-        topic: 'user.management.event',
-        messages: [{
-          key: event.categoryUuid,
-          value: JSON.stringify(event),
-          headers: { eventType: event.type }
-        }]
-      });
+      await this.publish('CategoryCreated', event);
       console.log(`Publisher Category Created Event ${event.categoryUuid}`);
 
     } catch (err: any) {
@@ -45,14 +28,7 @@ export class CategoryPublisher {
 
   async updateCategory(event: CategoryUpdatedEvent) {
     try {
-      await this.publisher.send({
-        topic: 'user.management.event',
-        messages: [{
-          key: event.categoryUuid,
-          value: JSON.stringify(event),
-          headers: { eventType: event.type }
-        }]
-      });
+      await this.publish('CategoryUpdated', event);
       console.log(`Publisher Category Update Event ${event.categoryUuid}`);
     } catch (err: any) {
       console.error(`Failed to publish CategoryCreated event: ${err.message}`);

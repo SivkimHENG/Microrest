@@ -33,12 +33,11 @@ class CategoryService {
     return event;
   }
 
-  async updateCategory(categoryId: number, payload: any) {
+  async updateCategory(categoryUuid: string, payload: any) {
 
     const event: CategoryUpdatedEvent = {
       eventId: uuidv4(),
-      id: categoryId,
-      categoryUuid: payload.categoryUuid,
+      categoryUuid: categoryUuid,
       category_name: payload.category_name,
       description: payload.description,
       updatedBy: "ADMIN",
@@ -59,11 +58,10 @@ class CategoryService {
   }
 
 
-  async deleteCategory(categoryId: number) {
+  async deleteCategory(categoryUuid: string) {
     const event: CategoryDeletedEvent = {
       eventId: uuidv4(),
-      categoryUuid: uuidv4(),
-      id: categoryId,
+      categoryUuid: categoryUuid,
       deletedBy: "ADMIN",
       deletedAt: new Date(),
       type: "CategoryDeleted"

@@ -18,6 +18,7 @@ const EVENT_EMITTER: Record<string, EventEmitter> = {
   },
   MenuItem: async (payload) => {
     await menuItemPublisher.createMenuItem(payload);
+    await menuItemPublisher.updateMenuItem(payload);
 
   }
 }

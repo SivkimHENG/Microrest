@@ -1,6 +1,6 @@
-import { Kafka, Producer } from "kafkajs";
+import { Producer } from "kafkajs";
 import { BaseProducer } from "./base.publisher";
-import { MenuItemCreatedEvent } from "../../utils/interface.utils";
+import { MenuItemCreatedEvent, MenuItemDeletedEvent, MenuItemUpdatedEvent } from "../../utils/interface.utils";
 
 
 export class MenuItemPublisher extends BaseProducer {
@@ -11,9 +11,7 @@ export class MenuItemPublisher extends BaseProducer {
 
   async createMenuItem(event: MenuItemCreatedEvent) {
     try {
-      await this.publish('MenuItemCreated', event, {
-        type: event.type
-      });
+      await this.publish('MenuItemCreated', event);
 
       console.log(`Menu Item Created ${event.itemUuid}`);
 
@@ -21,6 +19,30 @@ export class MenuItemPublisher extends BaseProducer {
       console.error(err.message);
       throw err;
     }
+  }
+
+  async updateMenuItem(event: MenuItemUpdatedEvent) {
+    try {
+      await this.publish('MenuItemUpdated', event);
+      console.log(`Menu Item Updated ${event.itemUuid}`);
+    } catch (err: any) {
+      console.error(err.message);
+      throw err;
+    }
+
+  }
+
+  async deleteMenuItem(event: MenuItemDeletedEvent) {
+    try {
+      await this.publish('MenuItemDeleted', event);
+      console.log(`Menu Item Updated ${event.itemUuid}`);
+
+    } catch (err: any) {
+      console.error(err.message);
+      throw err;
+
+    }
+
   }
 
 

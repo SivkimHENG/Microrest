@@ -3725,8 +3725,8 @@ export namespace Prisma {
 
   export type MenuItemVariationMinAggregateOutputType = {
     id: number | null
-    size_name: string | null
     menuItemId: number | null
+    size_name: string | null
     priceAdjustment: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3734,8 +3734,8 @@ export namespace Prisma {
 
   export type MenuItemVariationMaxAggregateOutputType = {
     id: number | null
-    size_name: string | null
     menuItemId: number | null
+    size_name: string | null
     priceAdjustment: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3743,8 +3743,8 @@ export namespace Prisma {
 
   export type MenuItemVariationCountAggregateOutputType = {
     id: number
-    size_name: number
     menuItemId: number
+    size_name: number
     priceAdjustment: number
     createdAt: number
     updatedAt: number
@@ -3766,8 +3766,8 @@ export namespace Prisma {
 
   export type MenuItemVariationMinAggregateInputType = {
     id?: true
-    size_name?: true
     menuItemId?: true
+    size_name?: true
     priceAdjustment?: true
     createdAt?: true
     updatedAt?: true
@@ -3775,8 +3775,8 @@ export namespace Prisma {
 
   export type MenuItemVariationMaxAggregateInputType = {
     id?: true
-    size_name?: true
     menuItemId?: true
+    size_name?: true
     priceAdjustment?: true
     createdAt?: true
     updatedAt?: true
@@ -3784,8 +3784,8 @@ export namespace Prisma {
 
   export type MenuItemVariationCountAggregateInputType = {
     id?: true
-    size_name?: true
     menuItemId?: true
+    size_name?: true
     priceAdjustment?: true
     createdAt?: true
     updatedAt?: true
@@ -3880,8 +3880,8 @@ export namespace Prisma {
 
   export type MenuItemVariationGroupByOutputType = {
     id: number
-    size_name: string | null
     menuItemId: number
+    size_name: string | null
     priceAdjustment: Decimal
     createdAt: Date
     updatedAt: Date
@@ -3908,8 +3908,8 @@ export namespace Prisma {
 
   export type MenuItemVariationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    size_name?: boolean
     menuItemId?: boolean
+    size_name?: boolean
     priceAdjustment?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3918,8 +3918,8 @@ export namespace Prisma {
 
   export type MenuItemVariationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    size_name?: boolean
     menuItemId?: boolean
+    size_name?: boolean
     priceAdjustment?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3928,8 +3928,8 @@ export namespace Prisma {
 
   export type MenuItemVariationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    size_name?: boolean
     menuItemId?: boolean
+    size_name?: boolean
     priceAdjustment?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3938,14 +3938,14 @@ export namespace Prisma {
 
   export type MenuItemVariationSelectScalar = {
     id?: boolean
-    size_name?: boolean
     menuItemId?: boolean
+    size_name?: boolean
     priceAdjustment?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type MenuItemVariationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "size_name" | "menuItemId" | "priceAdjustment" | "createdAt" | "updatedAt", ExtArgs["result"]["menuItemVariation"]>
+  export type MenuItemVariationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "menuItemId" | "size_name" | "priceAdjustment" | "createdAt" | "updatedAt", ExtArgs["result"]["menuItemVariation"]>
   export type MenuItemVariationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     menuItem?: boolean | MenuItemDefaultArgs<ExtArgs>
   }
@@ -3963,8 +3963,8 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      size_name: string | null
       menuItemId: number
+      size_name: string | null
       priceAdjustment: Prisma.Decimal
       createdAt: Date
       updatedAt: Date
@@ -4393,8 +4393,8 @@ export namespace Prisma {
    */
   interface MenuItemVariationFieldRefs {
     readonly id: FieldRef<"MenuItemVariation", 'Int'>
-    readonly size_name: FieldRef<"MenuItemVariation", 'String'>
     readonly menuItemId: FieldRef<"MenuItemVariation", 'Int'>
+    readonly size_name: FieldRef<"MenuItemVariation", 'String'>
     readonly priceAdjustment: FieldRef<"MenuItemVariation", 'Decimal'>
     readonly createdAt: FieldRef<"MenuItemVariation", 'DateTime'>
     readonly updatedAt: FieldRef<"MenuItemVariation", 'DateTime'>
@@ -8018,8 +8018,8 @@ export namespace Prisma {
 
   export const MenuItemVariationScalarFieldEnum: {
     id: 'id',
-    size_name: 'size_name',
     menuItemId: 'menuItemId',
+    size_name: 'size_name',
     priceAdjustment: 'priceAdjustment',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -8354,8 +8354,8 @@ export namespace Prisma {
     OR?: MenuItemVariationWhereInput[]
     NOT?: MenuItemVariationWhereInput | MenuItemVariationWhereInput[]
     id?: IntFilter<"MenuItemVariation"> | number
-    size_name?: StringNullableFilter<"MenuItemVariation"> | string | null
     menuItemId?: IntFilter<"MenuItemVariation"> | number
+    size_name?: StringNullableFilter<"MenuItemVariation"> | string | null
     priceAdjustment?: DecimalFilter<"MenuItemVariation"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"MenuItemVariation"> | Date | string
     updatedAt?: DateTimeFilter<"MenuItemVariation"> | Date | string
@@ -8364,8 +8364,8 @@ export namespace Prisma {
 
   export type MenuItemVariationOrderByWithRelationInput = {
     id?: SortOrder
-    size_name?: SortOrderInput | SortOrder
     menuItemId?: SortOrder
+    size_name?: SortOrderInput | SortOrder
     priceAdjustment?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -8377,8 +8377,8 @@ export namespace Prisma {
     AND?: MenuItemVariationWhereInput | MenuItemVariationWhereInput[]
     OR?: MenuItemVariationWhereInput[]
     NOT?: MenuItemVariationWhereInput | MenuItemVariationWhereInput[]
-    size_name?: StringNullableFilter<"MenuItemVariation"> | string | null
     menuItemId?: IntFilter<"MenuItemVariation"> | number
+    size_name?: StringNullableFilter<"MenuItemVariation"> | string | null
     priceAdjustment?: DecimalFilter<"MenuItemVariation"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"MenuItemVariation"> | Date | string
     updatedAt?: DateTimeFilter<"MenuItemVariation"> | Date | string
@@ -8387,8 +8387,8 @@ export namespace Prisma {
 
   export type MenuItemVariationOrderByWithAggregationInput = {
     id?: SortOrder
-    size_name?: SortOrderInput | SortOrder
     menuItemId?: SortOrder
+    size_name?: SortOrderInput | SortOrder
     priceAdjustment?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -8404,8 +8404,8 @@ export namespace Prisma {
     OR?: MenuItemVariationScalarWhereWithAggregatesInput[]
     NOT?: MenuItemVariationScalarWhereWithAggregatesInput | MenuItemVariationScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"MenuItemVariation"> | number
-    size_name?: StringNullableWithAggregatesFilter<"MenuItemVariation"> | string | null
     menuItemId?: IntWithAggregatesFilter<"MenuItemVariation"> | number
+    size_name?: StringNullableWithAggregatesFilter<"MenuItemVariation"> | string | null
     priceAdjustment?: DecimalWithAggregatesFilter<"MenuItemVariation"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeWithAggregatesFilter<"MenuItemVariation"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"MenuItemVariation"> | Date | string
@@ -8750,8 +8750,8 @@ export namespace Prisma {
 
   export type MenuItemVariationUncheckedCreateInput = {
     id?: number
-    size_name?: string | null
     menuItemId: number
+    size_name?: string | null
     priceAdjustment: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -8767,8 +8767,8 @@ export namespace Prisma {
 
   export type MenuItemVariationUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    size_name?: NullableStringFieldUpdateOperationsInput | string | null
     menuItemId?: IntFieldUpdateOperationsInput | number
+    size_name?: NullableStringFieldUpdateOperationsInput | string | null
     priceAdjustment?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8776,8 +8776,8 @@ export namespace Prisma {
 
   export type MenuItemVariationCreateManyInput = {
     id?: number
-    size_name?: string | null
     menuItemId: number
+    size_name?: string | null
     priceAdjustment: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -8792,8 +8792,8 @@ export namespace Prisma {
 
   export type MenuItemVariationUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    size_name?: NullableStringFieldUpdateOperationsInput | string | null
     menuItemId?: IntFieldUpdateOperationsInput | number
+    size_name?: NullableStringFieldUpdateOperationsInput | string | null
     priceAdjustment?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9303,8 +9303,8 @@ export namespace Prisma {
 
   export type MenuItemVariationCountOrderByAggregateInput = {
     id?: SortOrder
-    size_name?: SortOrder
     menuItemId?: SortOrder
+    size_name?: SortOrder
     priceAdjustment?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -9318,8 +9318,8 @@ export namespace Prisma {
 
   export type MenuItemVariationMaxOrderByAggregateInput = {
     id?: SortOrder
-    size_name?: SortOrder
     menuItemId?: SortOrder
+    size_name?: SortOrder
     priceAdjustment?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -9327,8 +9327,8 @@ export namespace Prisma {
 
   export type MenuItemVariationMinOrderByAggregateInput = {
     id?: SortOrder
-    size_name?: SortOrder
     menuItemId?: SortOrder
+    size_name?: SortOrder
     priceAdjustment?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -9972,8 +9972,8 @@ export namespace Prisma {
     OR?: MenuItemVariationScalarWhereInput[]
     NOT?: MenuItemVariationScalarWhereInput | MenuItemVariationScalarWhereInput[]
     id?: IntFilter<"MenuItemVariation"> | number
-    size_name?: StringNullableFilter<"MenuItemVariation"> | string | null
     menuItemId?: IntFilter<"MenuItemVariation"> | number
+    size_name?: StringNullableFilter<"MenuItemVariation"> | string | null
     priceAdjustment?: DecimalFilter<"MenuItemVariation"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"MenuItemVariation"> | Date | string
     updatedAt?: DateTimeFilter<"MenuItemVariation"> | Date | string

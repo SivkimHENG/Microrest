@@ -40,23 +40,10 @@ class CategoryController {
     try {
       const data = req.body;
 
-      const id = Number(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
-          message: "Invalid category ID",
-        });
-      }
-      console.log(`The Request from http: ${id}`);
+      const { uuid } = req.params;
 
 
-      if (!id) {
-        return res.status(StatusCodes.NOT_FOUND).json({
-          message: "Required id for update"
-        });
-      }
-
-      const updated = await categoryService.updateCategory(id, data);
+      const updated = await categoryService.updateCategory(uuid, data);
       return res.status(StatusCodes.OK).json({
         message: "Admin updating category successfully",
         data: updated
@@ -72,21 +59,9 @@ class CategoryController {
 
   async delete(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const { uuid } = req.params;
 
-      if (isNaN(id)) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
-          message: "Invalid category ID",
-        });
-      }
-
-      if (!id) {
-        return res.status(StatusCodes.NOT_FOUND).json({
-          message: "Required id for update"
-        });
-      }
-
-      await categoryService.deleteCategory(id);
+      await categoryService.deleteCategory(uuid);
 
       return res.status(StatusCodes.OK).json({
         message: "Admin deleting category successfully",

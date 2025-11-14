@@ -1,4 +1,4 @@
-import { prisma } from "../../../database";
+import { prisma } from "../../../database"
 
 interface CategoryCreatedEvent {
   eventId: string
@@ -34,46 +34,64 @@ interface CategoryUpdatedEvent {
   }
 }
 
-
+//TODO: DONE 
 class CategoryHandlers {
 
   async create(event: CategoryCreatedEvent) {
     try {
-      const alreadyProcessed = await prisma.proccessedEvent.findUnique({
-        where: { eventId: event.eventId }
-      });
 
+      const result = await prisma.$transaction(async (tx) => {
 
-      if (alreadyProcessed) {
-        console.log(`Event ${event.eventId} alreadyProcessed, skipping.`)
-        return;
-      }
-      const result = await prisma.categories.create({
-        data: {
-          categoryUuid: event.categoryUuid,
-          category_name: event.category_name,
-          description: event.description,
-          createdBy: event.createdBy,
-          updatedBy: event.updatedBy,
+        const alreadyProcessed = await tx.proccessedEvent.findUnique({
+          where: { eventId: event.eventId }
+        });
+
+        if (alreadyProcessed) {
+          console.log(`Event ${event.eventId} alreadyProcessed, skipping.`)
+          return;
         }
-      });
 
-      await prisma.proccessedEvent.create({
-        data: {
-          eventId: event.eventId
+        const category = await tx.categories.findUnique({
+          where: { categoryUuid: event.categoryUuid }
+        });
+
+
+        if (!category) {
+          console.log("Category not found");
         }
-      });
+
+
+
+        const categories = await tx.categories.create({
+          data: {
+            categoryUuid: event.categoryUuid,
+            category_name: event.category_name,
+            description: event.description,
+            createdBy: event.createdBy,
+            updatedBy: event.updatedBy,
+          }
+        });
+
+        await tx.proccessedEvent.create({
+          data: {
+            eventId: event.eventId
+          }
+        });
+        return { categories }
+      })
+
       return result;
+
+
     } catch (err: any) {
       console.error(err.message);
-      throw err;
     }
 
   }
 
   async update(event: any) {
     try {
-      const categoryId = Number(event.id);
+      const categoryUuid = event.categoryUuid;
 
       const alreadyProcessed = await prisma.proccessedEvent.findUnique({
         where: { eventId: event.eventId }
@@ -86,16 +104,16 @@ class CategoryHandlers {
       }
 
       const existingCatgory = await prisma.categories.findUnique({
-        where: { id: categoryId }
+        where: { categoryUuid: event.categoryUuid }
       });
 
 
       if (!existingCatgory) {
-        throw new Error(`Category with id ${categoryId} not found`);
+        throw new Error(`Category with id ${categoryUuid} not found`);
       }
 
       const result = await prisma.categories.update({
-        where: { id: categoryId },
+        where: { categoryUuid },
         data: {
           category_name: event.category_name,
           description: event.description,
@@ -114,7 +132,7 @@ class CategoryHandlers {
 
   async delete(event: any) {
     try {
-      const categoryId = Number(event.id);
+      const categoryUuid = event.categoryUuid;
 
       const alreadyProcessed = await prisma.proccessedEvent.findUnique({
         where: { eventId: event.eventId }
@@ -127,16 +145,16 @@ class CategoryHandlers {
       }
 
       const existingCatgory = await prisma.categories.findUnique({
-        where: { id: categoryId }
+        where: { categoryUuid }
       });
 
 
       if (!existingCatgory) {
-        throw new Error(`Category with id ${categoryId} not found`);
+        throw new Error(`Category with  ${categoryUuid} not found`);
       }
 
       await prisma.categories.delete({
-        where: { id: categoryId },
+        where: { categoryUuid },
       });
 
     } catch (err: any) {

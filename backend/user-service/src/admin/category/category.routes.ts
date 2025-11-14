@@ -8,5 +8,5 @@ export const categoryRouter = Router();
 
 //TODO: Middlewaring the protected endpoints
 categoryRouter.post('/categories', categoryController.create);
-categoryRouter.put('/categories/:id', categoryController.update);
-categoryRouter.delete('/categories/:id', categoryController.delete);
+categoryRouter.put('/categories/:uuid', categoryController.update);
+categoryRouter.delete('/categories/:uuid', categoryController.delete);

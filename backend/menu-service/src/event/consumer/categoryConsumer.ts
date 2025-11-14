@@ -20,11 +20,6 @@ export class CategoryConsumer extends BaseConsumer {
       console.log(JSON.stringify(eventData, null, 2));
       console.log('=====================');
 
-      console.log('Processing category:', {
-        type: eventData.type,
-        eventId: eventData.eventId,
-        categoryId: eventData.category?.categoryId
-      });
 
       await processEvent(eventData);
 
@@ -33,7 +28,6 @@ export class CategoryConsumer extends BaseConsumer {
         message: err.message,
         stack: err.stack
       });
-      throw err;
     }
   }
 

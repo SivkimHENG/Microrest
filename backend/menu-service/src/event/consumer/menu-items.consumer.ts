@@ -2,7 +2,6 @@ import { kafka } from "../kafka/kafka.client";
 import { BaseConsumer } from "./consumer";
 import { processEvent } from "./handlers/index.handler";
 
-//TODO: Finish later!
 
 //Menu Item Endpoints
 export class MenuItemsConsumer extends BaseConsumer {
@@ -22,13 +21,12 @@ export class MenuItemsConsumer extends BaseConsumer {
       console.log('=====================');
 
 
-      console.log(`${eventData.category.categoryId}`)
-
-
       console.log('Processing category:', {
         type: eventData.type,
         eventId: eventData.eventId,
-        categoryId: eventData.category.categoryId
+        category: {
+          categoryId: eventData.category.categoryId,
+        }
       });
 
       await processEvent(eventData);
@@ -38,7 +36,6 @@ export class MenuItemsConsumer extends BaseConsumer {
         message: err.message,
         stack: err.stack
       });
-      throw err;
     }
   }
 

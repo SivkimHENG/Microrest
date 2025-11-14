@@ -144,8 +144,8 @@ exports.Prisma.MenuItemCategoriesScalarFieldEnum = {
 
 exports.Prisma.MenuItemVariationScalarFieldEnum = {
   id: 'id',
-  size_name: 'size_name',
   menuItemId: 'menuItemId',
+  size_name: 'size_name',
   priceAdjustment: 'priceAdjustment',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

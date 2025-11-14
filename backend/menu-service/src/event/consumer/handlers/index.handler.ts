@@ -8,7 +8,9 @@ const eventHandlers: Record<string, EventHandler> = {
   'CategoryUpdated': categoryHandlers.update,
   'CategoryDeleted': categoryHandlers.delete,
 
-  'MenuItemCreated': menuItemHandler.create
+  'MenuItemCreated': menuItemHandler.create,
+  'MenuItemUpdated': menuItemHandler.update,
+  'MenuItemDeleted': menuItemHandler.delete
 
 
 
@@ -31,7 +33,6 @@ export async function processEvent(event: any): Promise<void> {
   } catch (err: any) {
     console.error(`Handler for ${type} failed:`, {
       message: err.message,
-      stack: err.stack
     });
     throw err;
   }

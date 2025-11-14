@@ -8,7 +8,6 @@ export interface CategoryData {
 
 export interface CategoryUpdatedEvent {
   eventId: string
-  id: number
   categoryUuid: string
   category_name?: string
   description: string
@@ -35,7 +34,6 @@ export interface CategoryCreatedEvent {
 
 export interface CategoryDeletedEvent {
   eventId: string
-  id: number
   categoryUuid: string
   deletedBy: string
   deletedAt: Date
@@ -46,7 +44,6 @@ export interface CategoryDeletedEvent {
 export interface MenuItemCreatedEvent {
   eventId: string
   itemUuid: string
-  id: number
   menuItem_name: string
   description: string
   basePrice: number
@@ -69,10 +66,44 @@ export interface MenuItemCreatedEvent {
     description: string
   }
   type: "MenuItemCreated"
+}
+
+
+export interface MenuItemUpdatedEvent {
+  eventId: string
+  itemUuid: string
+  menuItem_name: string
+  description: string
+  basePrice: number
+  imageUrl: string
+  displayOrder: number
+  isAvailable: boolean
+  updatedBy: string
+  updatedAt: Date
+  type: "MenuItemUpdated"
+
+  menuItemVariant: {
+    menuItemVariantId: number
+    size_name: string
+    priceAdjustment: number
+  }
+
+  category: {
+    categoryId: number
+    categoryUuid: string
+    category_name: string
+    description: string
+  }
 
 }
 
 
-
+export interface MenuItemDeletedEvent {
+  eventId: string
+  itemUuid: string
+  deletedBy: string
+  deletedAt: Date
+  type: "MenuItemDeleted"
+}
 
 
