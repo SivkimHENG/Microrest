@@ -17,10 +17,10 @@ class BaseConsumer {
     async connect() {
         try {
             await this.consumer.connect();
-            await this.consumer.subscribe({ topic: this.topic });
+            await this.consumer.subscribe({ topic: this.topic, fromBeginning: true });
             await this.consumer.run({
                 eachMessage: async ({ message }) => {
-                    this.handleMessage(message);
+                    await this.handleMessage(message);
                 }
             });
         }

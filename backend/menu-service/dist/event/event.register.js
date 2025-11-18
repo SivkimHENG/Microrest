@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EventRegistry = void 0;
 const categoryConsumer_1 = require("./consumer/categoryConsumer");
+const menu_items_consumer_1 = require("./consumer/menu-items.consumer");
 class EventRegistry {
     consumers = [
         new categoryConsumer_1.CategoryConsumer(),
+        new menu_items_consumer_1.MenuItemsConsumer(),
     ];
     async startAll() {
         for (const consumer of this.consumers) {
@@ -19,4 +20,10 @@ class EventRegistry {
         }
     }
 }
-exports.EventRegistry = EventRegistry;
+(async () => {
+    const eventRegistry = new EventRegistry();
+    await eventRegistry.startAll();
+    process.on("SIGINT", async () => {
+        await eventRegistry.stopAll();
+    });
+})();

@@ -1,0 +1,23 @@
+http:
+  middlewares:
+    default-cors:
+      headers:
+        accessControlAllowOriginList:
+          - "*"
+        accessControlAllowMethods:
+          - "GET"
+          - "POST"
+          - "PATCH"
+          - "PUT"
+          - "DELETE"
+        accessControlAllowHeaders:
+          - "*"
+        accessControlAllowExposeHeaders:
+          - "*"
+        accessControlMaxAge: 100
+        addVaryHeader: true
+
+      rate-limit-basic:
+        rateLimit:
+          average: 100
+          burst: 50

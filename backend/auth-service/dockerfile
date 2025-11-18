@@ -2,15 +2,14 @@
 FROM node:20-bullseye AS builder
 WORKDIR /app
 
-# Copy package files first for better layer caching
+# Copy package files first (for caching)
 COPY package*.json ./
 RUN npm ci
 
-# Copy source and Prisma schema
-COPY prisma ./prisma
+# Copy full source including Prisma migrations
 COPY . .
 
-# Generate Prisma client and build your app (TypeScript -> JS)
+# Generate Prisma client and build TypeScript code
 RUN npx prisma generate
 RUN npm run build
 
@@ -21,13 +20,18 @@ WORKDIR /app
 ENV NODE_ENV=production \
     PORT=5001
 
-# Copy only what’s needed for runtime
-COPY --from=builder /app/package*.json ./
+
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+# Copy dependencies and build output
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/dist ./dist
 
+# Copy the entrypoint script
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
 EXPOSE 5001
 
-# Safe migration and start compiled app
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
+ENTRYPOINT ["./entrypoint.sh"]

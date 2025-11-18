@@ -4,18 +4,12 @@ import { StatusCodes } from "http-status-codes";
 import { Meta } from "./utils/interface";
 
 
-interface AuthRequest extends Request {
-  user?: {
-    userUuid: string;
-    role: string;
-  };
-}
 
 
 class CustomerController {
 
 
-  async searchProfile(req: AuthRequest, res: Response) {
+  async searchProfile(req: Request, res: Response) {
     try {
 
       const username = req.query.username as string;
@@ -51,7 +45,7 @@ class CustomerController {
   }
 
 
-  async getProfile(req: AuthRequest, res: Response) {
+  async getProfile(req: Request, res: Response) {
     try {
 
       const userUuid = req.user?.userUuid;
@@ -89,7 +83,7 @@ class CustomerController {
 
   }
 
-  async updateProfile(req: AuthRequest, res: Response) {
+  async updateProfile(req: Request, res: Response) {
     try {
       const userUuid = req.user?.userUuid;
       const payload = req.body;

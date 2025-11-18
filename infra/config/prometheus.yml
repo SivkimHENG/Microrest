@@ -1,0 +1,75 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'microservices-monitor'
+
+# Alertmanager configuration (optional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # Auth Service
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['auth-service:5001']
+        labels:
+          service: 'auth-service'
+          env: 'development'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # User Service
+  - job_name: 'user-service'
+    static_configs:
+      - targets: ['user-service:5002']
+        labels:
+          service: 'user-service'
+          env: 'development'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # PostgreSQL Exporters (if you add them)
+  # - job_name: 'postgres-auth'
+  #   static_configs:
+  #     - targets: ['postgres-exporter-auth:9187']
+
+  # - job_name: 'postgres-user'
+  #   static_configs:
+  #     - targets: ['postgres-exporter-user:9187']
+
+  # Kafka Exporter (if you add it)
+  # - job_name: 'kafka'
+  #   static_configs:
+  #     - targets: ['kafka-exporter:9308']
+
+  # Node Exporter (if you add it for system metrics)
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+
+  # Traefik metrics
+  - job_name: 'traefik'
+    static_configs:
+      - targets: ['traefik:8080']
+        labels:
+          service: 'traefik'
+    metrics_path: '/metrics'
+
+
+

@@ -23,9 +23,9 @@ app.use(morgan("combined"));
 
 
 
-app.use("/api/v1", router);
-app.use("/api/v1/admin", categoryRouter);
-app.use("/api/v1/admin", menuItemRouter)
+app.use("/api/v1/user", router);
+app.use("/api/v1/user", categoryRouter);
+app.use("/api/v1/user", menuItemRouter)
 
 
 

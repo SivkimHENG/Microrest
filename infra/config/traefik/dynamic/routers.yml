@@ -1,0 +1,6 @@
+http: 
+  routers: 
+    api-gateway:
+      rule: "Host(`localhost`)"
+      entryPoints: ["web"]
+      service: noop@internal

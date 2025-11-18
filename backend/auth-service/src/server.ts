@@ -21,11 +21,11 @@ app.use(morgan("combined"));
 
 
 
-(async function start() {
-  await startProducer();
+//(async function start() {
+// await startProducer();
 
-  setInterval(proccessOutboxEvents, 5000);
-})()
+//setInterval(proccessOutboxEvents, 10000);
+//}) ()
 
 
 

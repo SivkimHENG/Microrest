@@ -1,0 +1,24 @@
+name: microservices-platform
+
+include:
+  - ./compose/databases.yaml
+  - ./compose/messaging.yaml
+  - ./compose/gateway.yaml
+  - ./compose/services.yaml
+  - ./compose/monitoring.yaml
+
+volumes:
+  auth_db_data:
+  user_db_data:
+  menu_db_data:
+  kafka_data:
+  zookeeper_data:
+  zookeeper_log:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  backend-net:
+    driver: bridge
+  
+

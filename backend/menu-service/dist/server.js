@@ -4,11 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const menu_routes_1 = require("./menus/menu.routes");
 const PORT = 5003;
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-app.use("/api/v1/menu/");
+app.use("/api/v1/menu", menu_routes_1.menuRouter);
 app.listen(PORT, () => {
     console.log(`Listening at http://localhost:${PORT}`);
 });

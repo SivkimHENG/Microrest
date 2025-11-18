@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { customerController } from "./customer.controllers";
-import { authMiddleware } from "../middleware/authentication.middleware";
+import { JWTAuthentication, requiredRole } from "../middleware/auth.middleware";
 
 
 
@@ -8,12 +8,16 @@ import { authMiddleware } from "../middleware/authentication.middleware";
 export const router = Router();
 
 
-//TODO: Done
-router.get("/profile", authMiddleware, customerController.getProfile);
-router.get("/profile/user", authMiddleware, customerController.searchProfile)
-router.put("/profile", authMiddleware, customerController.updateProfile);
+router.get("/profile",
+  JWTAuthentication, requiredRole(["ADMIN"]),
+  customerController.getProfile);
+router.get("/profile/user",
+  JWTAuthentication, requiredRole(["ADMIN"]),
+  customerController.searchProfile)
 
-//TODO: Undone
+router.put("/profile",
+  JWTAuthentication, requiredRole(["ADMIN"]),
+  customerController.updateProfile);
 
 
 

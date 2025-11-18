@@ -3,18 +3,12 @@ import { categoryService } from "./category.service";
 import { Request, Response } from "express";
 
 
-interface AuthRequest extends Request {
-  user?: {
-    userUuid: string;
-    role: string;
-  };
-}
 
 
 
 class CategoryController {
 
-  async create(req: AuthRequest, res: Response) {
+  async create(req: Request, res: Response) {
     try {
       const data = req.body;
 

@@ -163,13 +163,13 @@ exports.Prisma.CustomerProfilesScalarFieldEnum = {
 
 exports.Prisma.CustomerAddressScalarFieldEnum = {
   id: 'id',
-  customerProfileId: 'customerProfileId',
   address_line1: 'address_line1',
   address_line2: 'address_line2',
   city: 'city',
   khan: 'khan',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  customerProfileId: 'customerProfileId'
 };
 
 exports.Prisma.LoginHistoryScalarFieldEnum = {

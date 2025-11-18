@@ -1,0 +1,129 @@
+services:
+  auth-service:
+    build:
+      context: ../../backend/auth-service/
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    env_file:
+      - ../../backend/auth-service/.env
+    ports:
+      - "5001:5001"
+    ##      - "5555:5555"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@auth-db:5432/authentication_db
+      - KAFKA_BROKER=kafka:9092
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - backend-net
+    volumes:
+      - ../../backend/auth-service:/app
+      - /app/node_modules
+    command: npm run dev
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:5001/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth-service.rule=PathPrefix(`/api/v1/auth`)"
+      - "traefik.http.services.auth-service.loadbalancer.server.port=5001"
+
+  user-service:
+    build:
+      context: ../../backend/user-service/
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: unless-stopped
+    env_file:
+      - ../../backend/user-service/.env
+    ports:
+      - "5002:5002"
+      - "5555:5555"
+    depends_on:
+      user-db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@user-db:5432/user_management_db
+      - KAFKA_BROKER=kafka:9092
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - backend-net
+    volumes:
+      - ../../backend/user-service:/app
+      - /app/node_modules
+    command: npm run dev
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:5002/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.user-service.rule=PathPrefix(`/api/v1/user`)"
+      - "traefik.http.services.user-service.loadbalancer.server.port=5002"
+
+
+  menu-service:
+    build:
+      context: ../../backend/menu-service/
+      dockerfile: Dockerfile
+    container_name: menu-service
+    restart: unless-stopped
+    env_file:
+      - ../../backend/menu-service/.env
+    ports:
+      - "5003:5003"
+    depends_on:
+      menu-db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@menu-db:5432/menu_db
+      - KAFKA_BROKER=kafka:9092
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - backend-net
+    volumes:
+      - ../../backend/menu-service:/app
+      - /app/node_modules
+    command: npm run dev
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:5003/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.menu-service.rule=PathPrefix(`/api/v1/menu`)"
+      - "traefik.http.services.menu-service.loadbalancer.server.port=5003"

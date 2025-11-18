@@ -5767,35 +5767,35 @@ export namespace Prisma {
 
   export type CustomerAddressMinAggregateOutputType = {
     id: number | null
-    customerProfileId: number | null
     address_line1: string | null
     address_line2: string | null
     city: string | null
     khan: string | null
     created_at: Date | null
     updated_at: Date | null
+    customerProfileId: number | null
   }
 
   export type CustomerAddressMaxAggregateOutputType = {
     id: number | null
-    customerProfileId: number | null
     address_line1: string | null
     address_line2: string | null
     city: string | null
     khan: string | null
     created_at: Date | null
     updated_at: Date | null
+    customerProfileId: number | null
   }
 
   export type CustomerAddressCountAggregateOutputType = {
     id: number
-    customerProfileId: number
     address_line1: number
     address_line2: number
     city: number
     khan: number
     created_at: number
     updated_at: number
+    customerProfileId: number
     _all: number
   }
 
@@ -5812,35 +5812,35 @@ export namespace Prisma {
 
   export type CustomerAddressMinAggregateInputType = {
     id?: true
-    customerProfileId?: true
     address_line1?: true
     address_line2?: true
     city?: true
     khan?: true
     created_at?: true
     updated_at?: true
+    customerProfileId?: true
   }
 
   export type CustomerAddressMaxAggregateInputType = {
     id?: true
-    customerProfileId?: true
     address_line1?: true
     address_line2?: true
     city?: true
     khan?: true
     created_at?: true
     updated_at?: true
+    customerProfileId?: true
   }
 
   export type CustomerAddressCountAggregateInputType = {
     id?: true
-    customerProfileId?: true
     address_line1?: true
     address_line2?: true
     city?: true
     khan?: true
     created_at?: true
     updated_at?: true
+    customerProfileId?: true
     _all?: true
   }
 
@@ -5932,13 +5932,13 @@ export namespace Prisma {
 
   export type CustomerAddressGroupByOutputType = {
     id: number
-    customerProfileId: number
     address_line1: string | null
     address_line2: string | null
     city: string
     khan: string
     created_at: Date
     updated_at: Date
+    customerProfileId: number
     _count: CustomerAddressCountAggregateOutputType | null
     _avg: CustomerAddressAvgAggregateOutputType | null
     _sum: CustomerAddressSumAggregateOutputType | null
@@ -5962,52 +5962,52 @@ export namespace Prisma {
 
   export type CustomerAddressSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    customerProfileId?: boolean
     address_line1?: boolean
     address_line2?: boolean
     city?: boolean
     khan?: boolean
     created_at?: boolean
     updated_at?: boolean
+    customerProfileId?: boolean
     customerProfile?: boolean | CustomerProfilesDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["customerAddress"]>
 
   export type CustomerAddressSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    customerProfileId?: boolean
     address_line1?: boolean
     address_line2?: boolean
     city?: boolean
     khan?: boolean
     created_at?: boolean
     updated_at?: boolean
+    customerProfileId?: boolean
     customerProfile?: boolean | CustomerProfilesDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["customerAddress"]>
 
   export type CustomerAddressSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    customerProfileId?: boolean
     address_line1?: boolean
     address_line2?: boolean
     city?: boolean
     khan?: boolean
     created_at?: boolean
     updated_at?: boolean
+    customerProfileId?: boolean
     customerProfile?: boolean | CustomerProfilesDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["customerAddress"]>
 
   export type CustomerAddressSelectScalar = {
     id?: boolean
-    customerProfileId?: boolean
     address_line1?: boolean
     address_line2?: boolean
     city?: boolean
     khan?: boolean
     created_at?: boolean
     updated_at?: boolean
+    customerProfileId?: boolean
   }
 
-  export type CustomerAddressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "customerProfileId" | "address_line1" | "address_line2" | "city" | "khan" | "created_at" | "updated_at", ExtArgs["result"]["customerAddress"]>
+  export type CustomerAddressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "address_line1" | "address_line2" | "city" | "khan" | "created_at" | "updated_at" | "customerProfileId", ExtArgs["result"]["customerAddress"]>
   export type CustomerAddressInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     customerProfile?: boolean | CustomerProfilesDefaultArgs<ExtArgs>
   }
@@ -6025,13 +6025,13 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      customerProfileId: number
       address_line1: string | null
       address_line2: string | null
       city: string
       khan: string
       created_at: Date
       updated_at: Date
+      customerProfileId: number
     }, ExtArgs["result"]["customerAddress"]>
     composites: {}
   }
@@ -6457,13 +6457,13 @@ export namespace Prisma {
    */
   interface CustomerAddressFieldRefs {
     readonly id: FieldRef<"CustomerAddress", 'Int'>
-    readonly customerProfileId: FieldRef<"CustomerAddress", 'Int'>
     readonly address_line1: FieldRef<"CustomerAddress", 'String'>
     readonly address_line2: FieldRef<"CustomerAddress", 'String'>
     readonly city: FieldRef<"CustomerAddress", 'String'>
     readonly khan: FieldRef<"CustomerAddress", 'String'>
     readonly created_at: FieldRef<"CustomerAddress", 'DateTime'>
     readonly updated_at: FieldRef<"CustomerAddress", 'DateTime'>
+    readonly customerProfileId: FieldRef<"CustomerAddress", 'Int'>
   }
     
 
@@ -8125,13 +8125,13 @@ export namespace Prisma {
 
   export const CustomerAddressScalarFieldEnum: {
     id: 'id',
-    customerProfileId: 'customerProfileId',
     address_line1: 'address_line1',
     address_line2: 'address_line2',
     city: 'city',
     khan: 'khan',
     created_at: 'created_at',
-    updated_at: 'updated_at'
+    updated_at: 'updated_at',
+    customerProfileId: 'customerProfileId'
   };
 
   export type CustomerAddressScalarFieldEnum = (typeof CustomerAddressScalarFieldEnum)[keyof typeof CustomerAddressScalarFieldEnum]
@@ -8563,25 +8563,25 @@ export namespace Prisma {
     OR?: CustomerAddressWhereInput[]
     NOT?: CustomerAddressWhereInput | CustomerAddressWhereInput[]
     id?: IntFilter<"CustomerAddress"> | number
-    customerProfileId?: IntFilter<"CustomerAddress"> | number
     address_line1?: StringNullableFilter<"CustomerAddress"> | string | null
     address_line2?: StringNullableFilter<"CustomerAddress"> | string | null
     city?: StringFilter<"CustomerAddress"> | string
     khan?: StringFilter<"CustomerAddress"> | string
     created_at?: DateTimeFilter<"CustomerAddress"> | Date | string
     updated_at?: DateTimeFilter<"CustomerAddress"> | Date | string
+    customerProfileId?: IntFilter<"CustomerAddress"> | number
     customerProfile?: XOR<CustomerProfilesScalarRelationFilter, CustomerProfilesWhereInput>
   }
 
   export type CustomerAddressOrderByWithRelationInput = {
     id?: SortOrder
-    customerProfileId?: SortOrder
     address_line1?: SortOrderInput | SortOrder
     address_line2?: SortOrderInput | SortOrder
     city?: SortOrder
     khan?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
+    customerProfileId?: SortOrder
     customerProfile?: CustomerProfilesOrderByWithRelationInput
   }
 
@@ -8590,25 +8590,25 @@ export namespace Prisma {
     AND?: CustomerAddressWhereInput | CustomerAddressWhereInput[]
     OR?: CustomerAddressWhereInput[]
     NOT?: CustomerAddressWhereInput | CustomerAddressWhereInput[]
-    customerProfileId?: IntFilter<"CustomerAddress"> | number
     address_line1?: StringNullableFilter<"CustomerAddress"> | string | null
     address_line2?: StringNullableFilter<"CustomerAddress"> | string | null
     city?: StringFilter<"CustomerAddress"> | string
     khan?: StringFilter<"CustomerAddress"> | string
     created_at?: DateTimeFilter<"CustomerAddress"> | Date | string
     updated_at?: DateTimeFilter<"CustomerAddress"> | Date | string
+    customerProfileId?: IntFilter<"CustomerAddress"> | number
     customerProfile?: XOR<CustomerProfilesScalarRelationFilter, CustomerProfilesWhereInput>
   }, "id">
 
   export type CustomerAddressOrderByWithAggregationInput = {
     id?: SortOrder
-    customerProfileId?: SortOrder
     address_line1?: SortOrderInput | SortOrder
     address_line2?: SortOrderInput | SortOrder
     city?: SortOrder
     khan?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
+    customerProfileId?: SortOrder
     _count?: CustomerAddressCountOrderByAggregateInput
     _avg?: CustomerAddressAvgOrderByAggregateInput
     _max?: CustomerAddressMaxOrderByAggregateInput
@@ -8621,13 +8621,13 @@ export namespace Prisma {
     OR?: CustomerAddressScalarWhereWithAggregatesInput[]
     NOT?: CustomerAddressScalarWhereWithAggregatesInput | CustomerAddressScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"CustomerAddress"> | number
-    customerProfileId?: IntWithAggregatesFilter<"CustomerAddress"> | number
     address_line1?: StringNullableWithAggregatesFilter<"CustomerAddress"> | string | null
     address_line2?: StringNullableWithAggregatesFilter<"CustomerAddress"> | string | null
     city?: StringWithAggregatesFilter<"CustomerAddress"> | string
     khan?: StringWithAggregatesFilter<"CustomerAddress"> | string
     created_at?: DateTimeWithAggregatesFilter<"CustomerAddress"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"CustomerAddress"> | Date | string
+    customerProfileId?: IntWithAggregatesFilter<"CustomerAddress"> | number
   }
 
   export type LoginHistoryWhereInput = {
@@ -9018,13 +9018,13 @@ export namespace Prisma {
 
   export type CustomerAddressUncheckedCreateInput = {
     id?: number
-    customerProfileId: number
     address_line1?: string | null
     address_line2?: string | null
     city: string
     khan: string
     created_at?: Date | string
     updated_at?: Date | string
+    customerProfileId: number
   }
 
   export type CustomerAddressUpdateInput = {
@@ -9039,24 +9039,24 @@ export namespace Prisma {
 
   export type CustomerAddressUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    customerProfileId?: IntFieldUpdateOperationsInput | number
     address_line1?: NullableStringFieldUpdateOperationsInput | string | null
     address_line2?: NullableStringFieldUpdateOperationsInput | string | null
     city?: StringFieldUpdateOperationsInput | string
     khan?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    customerProfileId?: IntFieldUpdateOperationsInput | number
   }
 
   export type CustomerAddressCreateManyInput = {
     id?: number
-    customerProfileId: number
     address_line1?: string | null
     address_line2?: string | null
     city: string
     khan: string
     created_at?: Date | string
     updated_at?: Date | string
+    customerProfileId: number
   }
 
   export type CustomerAddressUpdateManyMutationInput = {
@@ -9070,13 +9070,13 @@ export namespace Prisma {
 
   export type CustomerAddressUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    customerProfileId?: IntFieldUpdateOperationsInput | number
     address_line1?: NullableStringFieldUpdateOperationsInput | string | null
     address_line2?: NullableStringFieldUpdateOperationsInput | string | null
     city?: StringFieldUpdateOperationsInput | string
     khan?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    customerProfileId?: IntFieldUpdateOperationsInput | number
   }
 
   export type LoginHistoryCreateInput = {
@@ -9554,13 +9554,13 @@ export namespace Prisma {
 
   export type CustomerAddressCountOrderByAggregateInput = {
     id?: SortOrder
-    customerProfileId?: SortOrder
     address_line1?: SortOrder
     address_line2?: SortOrder
     city?: SortOrder
     khan?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
+    customerProfileId?: SortOrder
   }
 
   export type CustomerAddressAvgOrderByAggregateInput = {
@@ -9570,24 +9570,24 @@ export namespace Prisma {
 
   export type CustomerAddressMaxOrderByAggregateInput = {
     id?: SortOrder
-    customerProfileId?: SortOrder
     address_line1?: SortOrder
     address_line2?: SortOrder
     city?: SortOrder
     khan?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
+    customerProfileId?: SortOrder
   }
 
   export type CustomerAddressMinOrderByAggregateInput = {
     id?: SortOrder
-    customerProfileId?: SortOrder
     address_line1?: SortOrder
     address_line2?: SortOrder
     city?: SortOrder
     khan?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
+    customerProfileId?: SortOrder
   }
 
   export type CustomerAddressSumOrderByAggregateInput = {
@@ -10181,13 +10181,13 @@ export namespace Prisma {
     OR?: CustomerAddressScalarWhereInput[]
     NOT?: CustomerAddressScalarWhereInput | CustomerAddressScalarWhereInput[]
     id?: IntFilter<"CustomerAddress"> | number
-    customerProfileId?: IntFilter<"CustomerAddress"> | number
     address_line1?: StringNullableFilter<"CustomerAddress"> | string | null
     address_line2?: StringNullableFilter<"CustomerAddress"> | string | null
     city?: StringFilter<"CustomerAddress"> | string
     khan?: StringFilter<"CustomerAddress"> | string
     created_at?: DateTimeFilter<"CustomerAddress"> | Date | string
     updated_at?: DateTimeFilter<"CustomerAddress"> | Date | string
+    customerProfileId?: IntFilter<"CustomerAddress"> | number
   }
 
   export type CustomerProfilesCreateWithoutAddressInput = {
