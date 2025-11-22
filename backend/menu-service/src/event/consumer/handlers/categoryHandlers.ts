@@ -1,7 +1,7 @@
 import { prisma } from "../../../database"
 
 interface CategoryCreatedEvent {
-  eventId: string
+  event_id: string
   categoryUuid: string
   category_name?: string
   description: string
@@ -20,7 +20,7 @@ interface CategoryData {
 }
 
 interface CategoryUpdatedEvent {
-  eventId: string
+  event_id: string
   categoryId: number
   categoryUuid?: string
   category_name?: string
@@ -43,11 +43,11 @@ class CategoryHandlers {
       const result = await prisma.$transaction(async (tx) => {
 
         const alreadyProcessed = await tx.proccessedEvent.findUnique({
-          where: { eventId: event.eventId }
+          where: { eventId: event.event_id }
         });
 
         if (alreadyProcessed) {
-          console.log(`Event ${event.eventId} alreadyProcessed, skipping.`)
+          console.log(`Event ${event.event_id} alreadyProcessed, skipping.`)
           return;
         }
 
@@ -74,7 +74,7 @@ class CategoryHandlers {
 
         await tx.proccessedEvent.create({
           data: {
-            eventId: event.eventId
+            eventId: event.event_id
           }
         });
         return { categories }
@@ -94,12 +94,12 @@ class CategoryHandlers {
       const categoryUuid = event.categoryUuid;
 
       const alreadyProcessed = await prisma.proccessedEvent.findUnique({
-        where: { eventId: event.eventId }
+        where: { eventId: event.event_id }
       });
 
 
       if (alreadyProcessed) {
-        console.log(`Event ${event.eventId} alreadyProcessed, skipping.`)
+        console.log(`Event ${event.event_id} alreadyProcessed, skipping.`)
         return;
       }
 
@@ -135,12 +135,12 @@ class CategoryHandlers {
       const categoryUuid = event.categoryUuid;
 
       const alreadyProcessed = await prisma.proccessedEvent.findUnique({
-        where: { eventId: event.eventId }
+        where: { eventId: event.event_id }
       });
 
 
       if (alreadyProcessed) {
-        console.log(`Event ${event.eventId} alreadyProcessed, skipping.`)
+        console.log(`Event ${event.event_id} alreadyProcessed, skipping.`)
         return;
       }
 

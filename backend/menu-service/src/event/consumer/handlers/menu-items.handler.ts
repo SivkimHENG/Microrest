@@ -32,7 +32,7 @@ interface MenuItemCreatedEvent {
 }
 
 interface MenuItemUpdatedEvent {
-  eventId: string
+  event_id: string
   itemUuid: string
   id: number
   menuItem_name: string
@@ -69,21 +69,21 @@ export class MenuItemHandler {
     try {
       const result = await prisma.$transaction(async (tx) => {
         const alreadyProcessed = await tx.proccessedEvent.findUnique({
-          where: { eventId: event.eventId }
+          where: { eventId: event.event_id }
         });
 
 
         if (alreadyProcessed) {
-          console.log(`Event ${event.eventId} alreadyProcessed, skipping.`)
+          console.log(`Event ${event.event_id} alreadyProcessed, skipping.`)
           return;
         }
 
 
 
         if (!event.category?.categoryId) {
-          console.log(`Event ${event.eventId} missing categoryUuid, skipping.`);
+          console.log(`Event ${event.event_id} missing categoryUuid, skipping.`);
           await tx.proccessedEvent.create({
-            data: { eventId: event.eventId }
+            data: { eventId: event.event_id }
           });
           return;
         }
@@ -95,7 +95,7 @@ export class MenuItemHandler {
         if (!category) {
           console.log(`Category ${event.category.id} not found. Skipping.`);
           await tx.proccessedEvent.create({
-            data: { eventId: event.eventId }
+            data: { eventId: event.event_id }
           });
           return;
         }
@@ -108,7 +108,7 @@ export class MenuItemHandler {
         if (existing) {
           console.log(`MenuItem ${event.itemUuid} already exists, skipping.`);
           await tx.proccessedEvent.create({
-            data: { eventId: event.eventId }
+            data: { eventId: event.event_id }
           });
           return existing;
         }
@@ -148,10 +148,10 @@ export class MenuItemHandler {
 
         await tx.proccessedEvent.create({
           data: {
-            eventId: event.eventId
+            eventId: event.event_id
           }
         });
-        console.log(`Successfully processed event ${event.eventId}`);
+        console.log(`Successfully processed event ${event.event_id}`);
 
         return menuItem;
       });
@@ -166,11 +166,11 @@ export class MenuItemHandler {
     try {
 
       const alreadyProcessed = await prisma.proccessedEvent.findUnique({
-        where: { eventId: event.eventId }
+        where: { eventId: event.event_id }
       });
 
       if (alreadyProcessed) {
-        console.log(`Event ${event.eventId} alreadyProcessed, skipping.`)
+        console.log(`Event ${event.event_id} alreadyProcessed, skipping.`)
         return;
       }
 
@@ -182,7 +182,7 @@ export class MenuItemHandler {
       if (!category) {
         console.log(`Category ${event.category.id} not found. Skipping.`);
         await prisma.proccessedEvent.create({
-          data: { eventId: event.eventId }
+          data: { eventId: event.event_id }
         });
         return;
       }
@@ -195,7 +195,7 @@ export class MenuItemHandler {
 
       if (!existing) {
         console.log(`Not found Menu Item : ${event.itemUuid} skipping`);
-        await prisma.proccessedEvent.create({ data: { eventId: event.eventId } });
+        await prisma.proccessedEvent.create({ data: { eventId: event.event_id } });
         return;
       }
 
@@ -241,12 +241,12 @@ export class MenuItemHandler {
 
       const alreadyProcessed = await prisma.proccessedEvent.findUnique({
         where: {
-          eventId: event.eventId
+          eventId: event.event_id
         }
       });
 
       if (alreadyProcessed) {
-        console.log(`Event ${event.eventId} alreadyProcessed, skipping`);
+        console.log(`Event ${event.event_id} alreadyProcessed, skipping`);
         return;
 
       }

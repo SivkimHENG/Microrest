@@ -13,9 +13,6 @@ npx prisma migrate deploy
 echo " Setup complete. Starting application..."
 exec npm run dev
 
-
-## Setup consumer here with package.json script
-
 echo "Starting consumer from topic..."
 exec npm run consumer
 

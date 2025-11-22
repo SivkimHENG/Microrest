@@ -1,13 +1,17 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
-import { startConsumer, stopConsumer } from "./events/consumer";
 import { router } from "./customer/customer.routes";
-import { categoryRouter } from "./admin/category/category.routes";
-import { publisherRegistry } from "./events/publisher/publisher.registry";
-import { processOutboxEvent } from "./events/publisher/outbox";
-import { menuItemRouter } from "./admin/menu/menuItem.routes";
+import { Bootstrap } from "./events/bootstrap";
+import { KafkaEventBus } from "./events/infrastructure/kafka";
+import { EventRegistryService, PublisherRegistryService } from "./events/infrastructure/service";
+import { logLevel } from "kafkajs";
+import { router as category } from "./events/domain/catalog/router/category.routes";
+import { router as menuItem } from "./events/domain/catalog/router/menu-item.routes";
+
+
+
 
 dotenv.config();
 
@@ -23,54 +27,44 @@ app.use(morgan("combined"));
 
 
 
-app.use("/api/v1/user", router);
-app.use("/api/v1/user", categoryRouter);
-app.use("/api/v1/user", menuItemRouter)
+const kafkaConfig = {
+  consumer: {
+    clientId: "auth-service",
+    groupId: "auth-service-group",
+    brokers: ["kafka:9092"],
+    topics: ["auth.user.event"],
+    logLevel: logLevel.DEBUG
+  },
+  producer: {
+    clientId: "user-service",
+    brokers: ["kafka:9092"],
 
-
-
-
-app.listen(PORT, () => {
-  console.log(`Listening at http://${process.env.PORT}`);
-});
-
-
-
-
-async function start() {
-  await startConsumer().catch(console.error);
-  await publisherRegistry.startAll().catch(console.error);
-  setInterval(processOutboxEvent, 5000);
-}
-start();
-
-
-const shutdown = async (signal: string) => {
-  console.log(`\n${signal} received, shutting down...`);
-
-  try {
-    await stopConsumer();
-    process.exit(0);
-  } catch (err) {
-    console.error("Shutdown error:", err);
-    process.exit(1);
   }
 }
 
 
+async function main() {
+  const eventBus = new KafkaEventBus(kafkaConfig);
+  const eventRegistry = new EventRegistryService();
+  const publisherRegistry = new PublisherRegistryService(eventBus);
 
 
+  const bootstrap = new Bootstrap(eventBus, eventRegistry, publisherRegistry);
+  await bootstrap.initialize();
 
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
-process.once('SIGUSR2', async () => {
-  await shutdown('SIGUSR2');
-  process.kill(process.pid, 'SIGUSR2');
+  app.use("/api/v1/user", router);
+  app.use("/api/v1/user", category)
+  app.use("/api/v1/user", menuItem);
+
+  app.listen(PORT, () => {
+    console.log(`Listening at http://${process.env.PORT}`);
+  });
+
+}
+
+
+main().catch((err) => {
+  console.error("Fatal bootstrap error:", err);
+  process.exit(1);
 });
-
-
-
-
-
-
 

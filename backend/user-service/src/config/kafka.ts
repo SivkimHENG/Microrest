@@ -36,7 +36,6 @@ export const consumer = kafka.consumer({
     retries: 5,
     initialRetryTime: 300
   }
-
 });
 
 

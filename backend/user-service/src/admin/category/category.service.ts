@@ -1,6 +1,5 @@
 import { producer } from "../../config/kafka";
 import { v4 as uuidv4 } from "uuid";
-import { CategoryPublisher } from "../../events/publisher/category.producer";
 import {
   CategoryCreatedEvent,
   CategoryDeletedEvent,
@@ -10,7 +9,6 @@ import {
 
 class CategoryService {
 
-  private publisher = new CategoryPublisher(producer);
 
 
   async createCategory(payload: any) {

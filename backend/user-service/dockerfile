@@ -36,4 +36,6 @@ RUN chmod +x ./entrypoint.sh
 
 EXPOSE 5002
 
+RUN npm run dev
+
 ENTRYPOINT ["./entrypoint.sh"]
