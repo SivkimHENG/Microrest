@@ -1,0 +1,9 @@
+FROM node:20-bullseye AS dependencies  
+WORKDIR /app
+COPY package*.json / 
+RUN npm ci 
+
+
+
+
+ENTRYPOINT [ "entrypoint.sh" ]

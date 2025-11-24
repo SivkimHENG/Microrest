@@ -31,9 +31,3 @@ menuRouter.get("/categories",
   requiredRole(['ADMIN', 'CUSTOMER']),
   menuController.listCategories);
 
-
-
-
-
-
-

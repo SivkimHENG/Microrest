@@ -6,6 +6,7 @@ include:
   - ./compose/gateway.yaml
   - ./compose/services.yaml
   - ./compose/monitoring.yaml
+  - ./compose/redis.yaml
 
 volumes:
   auth_db_data:
@@ -16,9 +17,8 @@ volumes:
   zookeeper_log:
   prometheus_data:
   grafana_data:
+  redis_data:
 
 networks:
   backend-net:
     driver: bridge
-  
-
